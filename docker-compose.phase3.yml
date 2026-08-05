@@ -1,0 +1,23 @@
+# Phase-3 optional infra (PostgreSQL + Redis)
+# Usage: docker compose -f docker-compose.phase3.yml up -d
+# Then set DATABASE_URL and REDIS_URL in backend/.env
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ellowring
+      POSTGRES_PASSWORD: ellowring
+      POSTGRES_DB: ellowring
+    ports:
+      - "5432:5432"
+    volumes:
+      - ellowring_pg:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  ellowring_pg:

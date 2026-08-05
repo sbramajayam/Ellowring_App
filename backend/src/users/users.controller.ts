@@ -1,0 +1,12 @@
+import { Controller, Get } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Controller('users')
+export class UsersController {
+  constructor(private prisma: PrismaService) {}
+
+  @Get('health')
+  health() {
+    return { status: 'ok', product: 'Ellowring', tagline: 'Learn. Prepare. Build. Get Hired.' };
+  }
+}

@@ -1,0 +1,429 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  COLLEGE
+  COMPANY
+  TRAINING
+  PARTNER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  SHORTLISTED
+  INTERVIEW
+  SELECTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ALERT
+  SYSTEM
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?
+  passwordHash  String
+  name          String
+  role          Role      @default(STUDENT)
+  avatarUrl     String?
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  student       Student?
+  college       College?
+  company       Company?
+  training      TrainingPartner?
+  partner       ChannelPartner?
+  wallet        Wallet?
+  notifications Notification[]
+  otps          Otp[]
+  applications  Application[]
+  payments      Payment[]
+  coupons       CouponRedemption[]
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  code      String
+  purpose   String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  userId    String?
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Student {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grade           String?
+  stream          String?
+  schoolName      String?
+  collegeName     String?
+  city            String?
+  state           String?
+  careerInterest  String?
+  resumeUrl       String?
+  bio             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  enrollments     Enrollment[]
+  coachingEnrolls CoachingEnrollment[]
+  certificates    Certificate[]
+}
+
+model College {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  code        String?
+  city        String?
+  state       String?
+  type        String?
+  website     String?
+  description String?
+  logoUrl     String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admissions  Admission[]
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  industry    String?
+  size        String?
+  city        String?
+  website     String?
+  description String?
+  logoUrl     String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  jobs        Job[]
+  internships Internship[]
+  projects    LiveProject[]
+}
+
+model TrainingPartner {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  specialty   String?
+  city        String?
+  website     String?
+  description String?
+  logoUrl     String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  courses     Course[]
+  coaching    CoachingModule[]
+}
+
+model ChannelPartner {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  region      String?
+  referralCode String  @unique
+  commissionPct Float  @default(10)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  category    String
+  level       String
+  duration    String?
+  price       Float    @default(0)
+  description String?
+  thumbnail   String?
+  isPublished Boolean  @default(true)
+  partnerId   String?
+  partner     TrainingPartner? @relation(fields: [partnerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  studentId  String
+  courseId   String
+  progress   Int      @default(0)
+  status     String   @default("ACTIVE")
+  enrolledAt DateTime @default(now())
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+model CoachingModule {
+  id          String   @id @default(cuid())
+  title       String
+  examType    String
+  description String?
+  price       Float    @default(0)
+  duration    String?
+  batchSize   Int?
+  isPublished Boolean  @default(true)
+  partnerId   String?
+  partner     TrainingPartner? @relation(fields: [partnerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  enrollments CoachingEnrollment[]
+}
+
+model CoachingEnrollment {
+  id         String         @id @default(cuid())
+  studentId  String
+  coachingId String
+  status     String         @default("ACTIVE")
+  enrolledAt DateTime       @default(now())
+  student    Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  coaching   CoachingModule @relation(fields: [coachingId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, coachingId])
+}
+
+model CareerGuidance {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  summary     String?
+  content     String?
+  targetGrade String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Admission {
+  id          String   @id @default(cuid())
+  collegeId   String
+  college     College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  program     String
+  stream      String?
+  seats       Int      @default(0)
+  fees        Float?
+  deadline    DateTime?
+  description String?
+  isOpen      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StudyAbroad {
+  id          String   @id @default(cuid())
+  country     String
+  university  String
+  program     String
+  tuition     Float?
+  duration    String?
+  requirements String?
+  description String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Internship {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title       String
+  location    String?
+  mode        String   @default("REMOTE")
+  stipend     Float?
+  duration    String?
+  description String?
+  skills      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications Application[]
+}
+
+model LiveProject {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title       String
+  domain      String?
+  description String?
+  duration    String?
+  stipend     Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications Application[]
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title       String
+  location    String?
+  type        String   @default("FULL_TIME")
+  salaryMin   Float?
+  salaryMax   Float?
+  experience  String?
+  description String?
+  skills      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications Application[]
+}
+
+model Application {
+  id           String            @id @default(cuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId        String?
+  job          Job?              @relation(fields: [jobId], references: [id])
+  internshipId String?
+  internship   Internship?       @relation(fields: [internshipId], references: [id])
+  projectId    String?
+  project      LiveProject?      @relation(fields: [projectId], references: [id])
+  status       ApplicationStatus @default(PENDING)
+  coverLetter  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Certificate {
+  id         String   @id @default(cuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title      String
+  issuer     String
+  issuedAt   DateTime @default(now())
+  credential String?
+  fileUrl    String?
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Float    @default(0)
+  updatedAt DateTime @updatedAt
+
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String
+  wallet      Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount      Float
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discountPct Float
+  maxUses     Int      @default(100)
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  redemptions CouponRedemption[]
+}
+
+model CouponRedemption {
+  id        String   @id @default(cuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([couponId, userId])
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Float
+  currency  String        @default("INR")
+  status    PaymentStatus @default(PENDING)
+  provider  String        @default("RAZORPAY")
+  reference String?
+  purpose   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

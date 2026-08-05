@@ -1,0 +1,35 @@
+# Phase-4 database infrastructure (PostgreSQL 16 + Redis 7)
+# Usage: docker compose -f docker-compose.phase4.yml up -d
+# Then set in backend/.env:
+#   DATABASE_URL="postgresql://ellowring:ellowring@localhost:5432/ellowring?schema=public"
+#   REDIS_URL="redis://localhost:6379"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ellowring
+      POSTGRES_PASSWORD: ellowring
+      POSTGRES_DB: ellowring
+    ports:
+      - "5432:5432"
+    volumes:
+      - ellowring_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ellowring -d ellowring"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  ellowring_pg:
