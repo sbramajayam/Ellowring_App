@@ -37,9 +37,25 @@ jobs:
           NEXT_PUBLIC_API_URL: https://quarterly-saturday-limousines-entitled.trycloudflare.com/api
         run: npm run build
 
-      - name: Publish to gh-pages branch
+      # Preferred: clean site branch
+      - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: frontend/out
+          publish_branch: gh-pages
           force_orphan: true
+
+      # Also publish onto main root so live site works when Pages source is still "main"
+      # (GitHub then serves index.html instead of README.md)
+      - name: Publish website onto main (keep source files)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: frontend/out
+          publish_branch: main
+          keep_files: true
+          force_orphan: false
+          allow_empty_commit: true
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
