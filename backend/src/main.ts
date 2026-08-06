@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   const corsOrigins = (process.env.CORS_ORIGIN ||
-    'https://sbramajayam.github.io,http://localhost:3000')
+    'https://sbramajayam.github.io,https://sbramajayam.github.io/Ell-web-app,https://sbramajayam.github.io/Ellowring_App,http://localhost:3000,http://127.0.0.1:3000')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);

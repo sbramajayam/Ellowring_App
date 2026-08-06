@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Building2, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { dashboardPath, Role, useAuth } from "@/lib/auth-context";
-import { EllowringLogo } from "@/components/ellowring-logo";
+import { AuthSplitShell, authUnderlineInput } from "@/components/auth-split-shell";
 
 const roles: { value: Role; label: string }[] = [
   { value: "STUDENT", label: "Student" },
@@ -26,6 +26,7 @@ export default function RegisterPage() {
     city: "",
     orgName: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -49,126 +50,128 @@ export default function RegisterPage() {
 
   if (authLoading || user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F4F7FB] text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
         Loading…
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F4F7FB] px-4 py-10">
-      <div className="w-full max-w-lg">
-        <Link href="/" className="mb-6 inline-flex justify-center sm:justify-start">
-          <EllowringLogo variant="stacked" size="lg" />
-        </Link>
+    <AuthSplitShell>
+      <h1 className="font-display text-[34px] font-bold tracking-tight text-[#1E293B] sm:text-[40px]">
+        Create account
+      </h1>
+      <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-slate-400">
+        Join Ellowring as a student or institution partner.
+      </p>
 
-        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Create your account</h1>
-        <p className="mt-2 text-sm text-slate-500">Join Ellowring as a student or institution partner.</p>
-
-        <form
-          onSubmit={onSubmit}
-          className="mt-6 space-y-3.5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200"
-        >
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-600">Full name</span>
-            <div className="relative">
-              <User size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
-            </div>
-          </label>
-
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-600">Email</span>
-            <div className="relative">
-              <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-              />
-            </div>
-          </label>
-
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-600">Password</span>
-            <div className="relative">
-              <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                type="password"
-                placeholder="Min 6 characters"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                minLength={6}
-              />
-            </div>
-          </label>
-
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-600">Role</span>
-            <select
-              className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
-            >
-              {roles.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
+      <form onSubmit={onSubmit} className="mt-8 space-y-6">
+        <label className="block">
+          <span className="text-[13px] font-bold text-[#1E293B]">Full name</span>
           <input
-            className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            className={authUnderlineInput}
+            placeholder="Your name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-[13px] font-bold text-[#1E293B]">Email</span>
+          <input
+            className={authUnderlineInput}
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-[13px] font-bold text-[#1E293B]">Password</span>
+          <div className="relative mt-2">
+            <input
+              className="w-full border-0 border-b border-slate-200 bg-transparent py-2.5 pr-10 text-[15px] text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-[#2563EB]"
+              type={showPassword ? "text" : "password"}
+              placeholder="Min 6 characters"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+              minLength={6}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-slate-400 transition hover:text-slate-600"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </label>
+
+        <label className="block">
+          <span className="text-[13px] font-bold text-[#1E293B]">Role</span>
+          <select
+            className={`${authUnderlineInput} appearance-none`}
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
+          >
+            {roles.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="text-[13px] font-bold text-[#1E293B]">City</span>
+          <input
+            className={authUnderlineInput}
             placeholder="City"
             value={form.city}
             onChange={(e) => setForm({ ...form, city: e.target.value })}
           />
+        </label>
 
-          {form.role !== "STUDENT" && (
-            <div className="relative">
-              <Building2 size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                placeholder="Organization name"
-                value={form.orgName}
-                onChange={(e) => setForm({ ...form, orgName: e.target.value })}
-              />
-            </div>
-          )}
+        {form.role !== "STUDENT" && (
+          <label className="block">
+            <span className="text-[13px] font-bold text-[#1E293B]">Organization</span>
+            <input
+              className={authUnderlineInput}
+              placeholder="Organization name"
+              value={form.orgName}
+              onChange={(e) => setForm({ ...form, orgName: e.target.value })}
+            />
+          </label>
+        )}
 
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">{error}</p>
-          )}
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">
+            {error}
+          </p>
+        )}
 
+        <div className="flex justify-end pt-1">
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2563EB] py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60"
+            className="rounded-xl bg-[#2563EB] px-8 py-3 text-[14px] font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 disabled:opacity-60"
           >
             {loading ? "Creating…" : "Create account"}
-            {!loading && <ArrowRight size={16} />}
           </button>
-        </form>
+        </div>
+      </form>
 
-        <p className="mt-5 text-center text-sm text-slate-500">
-          Already have an account?{" "}
-          <Link href="/" className="font-semibold text-[#2563EB] hover:underline">
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="mt-8 text-[13px] text-slate-400">
+        Already have an account?{" "}
+        <Link href="/" className="font-semibold text-[#2563EB] hover:underline">
+          Sign in
+        </Link>
+      </p>
+    </AuthSplitShell>
   );
 }

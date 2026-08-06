@@ -3,19 +3,18 @@
 import clsx from "clsx";
 
 /**
- * Official Ellowring brand mark — WWW / dashboard header lockup:
- * 5 ring segments with white gaps: Yellow · Red · Purple · Blue · Green
- * Text: ELLOWRING / SOFTWARE SOLUTIONS
+ * Official Ellowring brand — uses /brand/ellowring-logo.jpg (same as EWebsite).
+ * SVG mark reserved for dark/compact headers where the JPG white plate would clash.
  */
 
+/** Compact 5-segment ring for dark/small headers. */
 export function EllowringMark({ className = "h-10 w-10" }: { className?: string }) {
-  // Equal 5ths (~72°) with ~4° white gaps — matches Channel Partner / student header art
   const colors = [
-    { fill: "#F5C518", start: -90 }, // Yellow — top
-    { fill: "#E53935", start: -18 }, // Red
-    { fill: "#5B2EEA", start: 54 }, // Purple
-    { fill: "#1E88E5", start: 126 }, // Blue
-    { fill: "#43A047", start: 198 }, // Green
+    { fill: "#F5C518", start: -126 },
+    { fill: "#E53935", start: -54 },
+    { fill: "#3F2B96", start: 18 },
+    { fill: "#1BA7C8", start: 90 },
+    { fill: "#43A047", start: 162 },
   ];
   const cx = 32;
   const cy = 32;
@@ -67,6 +66,39 @@ export function EllowringLogo({
     return <EllowringMark className={clsx(markSize, className)} />;
   }
 
+  // Official JPG lockup (mark + ELLOWRING / SOFTWARE SOLUTIONS)
+  if (!dark) {
+    const h =
+      variant === "stacked"
+        ? size === "sm"
+          ? 72
+          : size === "lg"
+            ? 120
+            : 96
+        : size === "sm"
+          ? 40
+          : size === "lg"
+            ? 72
+            : 56;
+
+    return (
+      <div
+        className={clsx(
+          variant === "stacked" ? "inline-flex justify-center" : "inline-flex items-center",
+          className,
+        )}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/ellowring-logo.jpg"
+          alt="Ellowring Software Solutions"
+          className="w-auto object-contain"
+          style={{ height: h, maxWidth: variant === "horizontal" ? 260 : 200 }}
+        />
+      </div>
+    );
+  }
+
   if (variant === "stacked") {
     return (
       <div
@@ -74,27 +106,16 @@ export function EllowringLogo({
         aria-label="Ellowring Software Solutions"
       >
         <EllowringMark className={size === "lg" ? "h-14 w-14" : "h-12 w-12"} />
-        <div
-          className={clsx(
-            "mt-1.5 text-[15px] font-extrabold tracking-[0.06em]",
-            dark ? "text-white" : "text-black",
-          )}
-        >
+        <div className="mt-1.5 text-[15px] font-extrabold tracking-[0.06em] text-white">
           ELLOWRING
         </div>
-        <div
-          className={clsx(
-            "text-[8px] font-semibold uppercase tracking-[0.2em]",
-            dark ? "text-slate-300" : "text-black",
-          )}
-        >
+        <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-300">
           Software Solutions
         </div>
       </div>
     );
   }
 
-  // Horizontal — same lockup as Channel Partner / student dashboard header
   return (
     <div
       className={clsx("flex items-center gap-2.5", className)}
@@ -104,18 +125,20 @@ export function EllowringLogo({
       <div className="min-w-0 leading-[1.05]">
         <div
           className={clsx(
-            "truncate font-extrabold tracking-[0.02em]",
+            "truncate font-extrabold tracking-[0.02em] text-white",
             size === "sm" ? "text-[13px]" : size === "lg" ? "text-[18px]" : "text-[15px]",
-            dark ? "text-white" : "text-black",
           )}
         >
           ELLOWRING
         </div>
         <div
           className={clsx(
-            "truncate font-semibold uppercase",
-            size === "sm" ? "text-[7px] tracking-[0.16em]" : size === "lg" ? "text-[9px] tracking-[0.22em]" : "text-[8px] tracking-[0.2em]",
-            dark ? "text-slate-300" : "text-black",
+            "truncate font-semibold uppercase text-slate-300",
+            size === "sm"
+              ? "text-[7px] tracking-[0.16em]"
+              : size === "lg"
+                ? "text-[9px] tracking-[0.22em]"
+                : "text-[8px] tracking-[0.2em]",
           )}
         >
           Software Solutions
