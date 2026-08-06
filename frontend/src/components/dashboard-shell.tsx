@@ -68,7 +68,7 @@ export function DashboardShell({
   useEffect(() => {
     if (!loading && (!user || user.role !== role)) {
       const next = encodeURIComponent(pathname || "/");
-      router.replace(`/?next=${next}`);
+      router.replace(`/login?next=${next}`);
     }
   }, [user, loading, role, router, pathname]);
 

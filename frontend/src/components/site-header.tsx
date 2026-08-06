@@ -59,7 +59,7 @@ export function SiteHeader() {
             </>
           ) : (
             <>
-              <Link href="/" className="text-sm font-semibold text-slate-700">
+              <Link href="/login" className="text-sm font-semibold text-slate-700">
                 Login
               </Link>
               <Link

@@ -1,5 +1,9 @@
 # Ellowring
 
+> **Live website (GitHub Pages):** set **Settings → Pages → Branch = `gh-pages` / (root)**.  
+> If Pages is set to `main`, you will only see this README — not the app UI.  
+> Site URL after correct setting: https://sbramajayam.github.io/Ellowring_App/
+
 **Learn. Prepare. Build. Get Hired.**
 
 From 11th Standard to First Job — India's AI-powered Education, Career & Hiring ecosystem.

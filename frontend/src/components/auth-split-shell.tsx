@@ -3,10 +3,6 @@
 import { ArrowLeft } from "lucide-react";
 import { EllowringLogo } from "@/components/ellowring-logo";
 
-const WEBSITE_URL = (
-  process.env.NEXT_PUBLIC_WEBSITE_URL || "http://localhost:5173"
-).replace(/\/$/, "");
-
 /** Shared illustration for Sign In / Create Account split layout. */
 export function AuthHeroArt() {
   return (
@@ -101,7 +97,7 @@ export function AuthSplitShell({ children }: { children: React.ReactNode }) {
 
       <div className="relative z-10 w-full max-w-[920px]">
         <a
-          href={WEBSITE_URL}
+          href="/"
           className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-semibold text-white/90 backdrop-blur-sm ring-1 ring-white/20 transition hover:bg-white/15 hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
