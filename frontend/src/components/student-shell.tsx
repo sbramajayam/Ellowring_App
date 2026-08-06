@@ -66,7 +66,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "STUDENT")) {
-      router.replace("/");
+      router.replace("/login");
     }
   }, [user, loading, router]);
 

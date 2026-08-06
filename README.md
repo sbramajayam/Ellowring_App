@@ -1,8 +1,12 @@
 # Ellowring
 
-> **Live website (GitHub Pages):** set **Settings → Pages → Branch = `gh-pages` / (root)**.  
-> If Pages is set to `main`, you will only see this README — not the app UI.  
-> Site URL after correct setting: https://sbramajayam.github.io/Ellowring_App/
+> **Live site:** https://sbramajayam.github.io/Ellowring_App/  
+> **Must use Pages branch `gh-pages` (root).** If Settings → Pages uses `main`, you only see this README — not the website UI.
+
+**Flow on the live site**
+1. `/` — marketing website (home + menus)
+2. `/login` — application Sign In
+3. `/register` — create account → role dashboards
 
 **Learn. Prepare. Build. Get Hired.**
 

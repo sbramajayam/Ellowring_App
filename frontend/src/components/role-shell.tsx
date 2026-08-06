@@ -48,7 +48,7 @@ export function RoleShell({
 
   useEffect(() => {
     if (!loading && (!user || user.role !== role)) {
-      router.replace("/");
+      router.replace("/login");
     }
   }, [user, loading, role, router]);
 
