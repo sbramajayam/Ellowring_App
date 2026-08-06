@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { HealthController } from './health.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
@@ -26,8 +27,6 @@ import { PredictiveModule } from './predictive/predictive.module';
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     AuthModule,
-    // feature modules below
-    // AuthModule exports RolesGuard for RBAC
     UsersModule,
     CoursesModule,
     CoachingModule,
@@ -47,5 +46,6 @@ import { PredictiveModule } from './predictive/predictive.module';
     AdsModule,
     PredictiveModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

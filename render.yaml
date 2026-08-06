@@ -1,0 +1,29 @@
+# Render Blueprint — free NestJS API for Ellowring
+# Dashboard: https://dashboard.render.com → New → Blueprint → connect this repo
+
+services:
+  - type: web
+    name: ellowring-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+      healthCheckPath: /api/health
+      envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4001"
+      - key: DATABASE_URL
+        value: file:./data/prod.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: OTP_STATIC
+        value: "123456"
+      - key: ENTERPRISE_API_KEY
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://sbramajayam.github.io,http://localhost:3000

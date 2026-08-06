@@ -36,8 +36,9 @@ jobs:
         working-directory: frontend
         env:
           GITHUB_PAGES: "true"
-          # Optional: set when your Nest API is hosted publicly
-          # NEXT_PUBLIC_API_URL: https://your-api.example.com/api
+          # Temporary tunnel while local API + cloudflared are running.
+          # Replace with permanent Render URL later: https://YOUR-SERVICE.onrender.com/api
+          NEXT_PUBLIC_API_URL: https://gateway-wellington-investing-hosted.trycloudflare.com/api
         run: npm run build
 
       - name: Upload Pages artifact
