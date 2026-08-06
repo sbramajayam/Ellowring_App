@@ -1,0 +1,8 @@
+﻿# Serve Next.js static export on GitHub Pages (main branch).
+include:
+  - _next
+  - _not-found
+exclude:
+  - frontend
+  - backend
+  - node_modules
