@@ -1,14 +1,23 @@
 ﻿"use client";
 
 import { StudentShell } from "@/components/student-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
-export default function MessagesPage() {
+export default function Page() {
   return (
     <StudentShell>
-      <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
-      <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-        Inbox will sync mentoring, admission and recruiter threads in V1.1.
-      </div>
+      <RoleApiTablePage
+        title="Messages"
+        description="Inbox notices from Ellowring (notifications channel)."
+        endpoint="/notifications"
+        columns={[
+          { key: "title", label: "Subject", path: "title" },
+          { key: "message", label: "Preview", path: "message" },
+          { key: "type", label: "Type", path: "type" },
+          { key: "createdAt", label: "Received", path: "createdAt" },
+        ]}
+        emptyText="No messages yet."
+      />
     </StudentShell>
   );
 }

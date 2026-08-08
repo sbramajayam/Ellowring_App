@@ -1,22 +1,44 @@
 "use client";
 
 import { CollegeShell } from "@/components/college-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <CollegeShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Placement Cell</h1>
-          <p className="mt-1 text-sm text-slate-500">Campus drives, eligibility lists and company coordination.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Campus drives, eligibility lists and company coordination."
-        />
-        <DataTable columns={["Record","Programme","Owner","Status"]} rows={[["Sample Placement Cell","—","Admissions","Active"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Placement Cell"
+        description="Open jobs for campus placement drives."
+        endpoint="/jobs"
+        auth={false}
+        columns={[
+  {
+    "key": "title",
+    "label": "Role",
+    "path": "title"
+  },
+  {
+    "key": "company",
+    "label": "Company",
+    "path": "company.name"
+  },
+  {
+    "key": "location",
+    "label": "Location",
+    "path": "location"
+  },
+  {
+    "key": "type",
+    "label": "Type",
+    "path": "type"
+  },
+  {
+    "key": "mode",
+    "label": "Mode",
+    "path": "mode"
+  }
+]}
+      />
     </CollegeShell>
   );
 }

@@ -1,22 +1,44 @@
 "use client";
 
 import { PartnerShell } from "@/components/partner-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <PartnerShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Lead Management</h1>
-          <p className="mt-1 text-sm text-slate-500">Pipeline of open referrals with attribution status.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Pipeline of open referrals with attribution status."
-        />
-        <DataTable columns={["Record","Channel","Value","Status"]} rows={[["REF-1024","Student","₹1,200","Paid"],["REF-1029","Course","₹800","Pending"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Lead Management"
+        description="Partner leads captured in CRM."
+        endpoint="/partners/me/leads"
+        auth={true}
+        columns={[
+  {
+    "key": "name",
+    "label": "Lead",
+    "path": "name"
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "path": "email"
+  },
+  {
+    "key": "phone",
+    "label": "Phone",
+    "path": "phone"
+  },
+  {
+    "key": "source",
+    "label": "Source",
+    "path": "source"
+  },
+  {
+    "key": "status",
+    "label": "Status",
+    "path": "status"
+  }
+]}
+      />
     </PartnerShell>
   );
 }

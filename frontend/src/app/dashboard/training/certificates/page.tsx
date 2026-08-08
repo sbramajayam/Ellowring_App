@@ -1,22 +1,23 @@
 "use client";
 
 import { TrainingShell } from "@/components/training-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <TrainingShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Certificates</h1>
-          <p className="mt-1 text-sm text-slate-500">Issue and revoke verifiable certificates for completions.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Issue and revoke verifiable certificates for completions."
-        />
-        <DataTable columns={["Item","Owner","Updated","Status"]} rows={[["Sample Certificates","Ops","Today","Active"],["Pipeline item","Faculty","Yesterday","Draft"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Certificates"
+        description="Course outcomes used for certificate issuance planning."
+        endpoint="/courses"
+        auth={false}
+        columns={[
+          { key: "title", label: "Course", path: "title" },
+          { key: "category", label: "Category", path: "category.name" },
+          { key: "level", label: "Level", path: "level" },
+          { key: "price", label: "Price", path: "money:price" },
+        ]}
+      />
     </TrainingShell>
   );
 }

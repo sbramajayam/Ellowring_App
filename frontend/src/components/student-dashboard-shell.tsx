@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/lib/auth-context";
+import { goToWebsiteHome } from "@/lib/site";
 
 const studentNav = [
   { href: "/dashboard/student", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -50,8 +51,10 @@ const studentNav = [
 ] as const;
 
 function isActive(pathname: string, href: string, exact?: boolean) {
-  if (exact) return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const current = pathname.replace(/\/$/, "") || "/";
+  const target = href.replace(/\/$/, "") || "/";
+  if (exact) return current === target;
+  return current === target || current.startsWith(`${target}/`);
 }
 
 function greetingForHour(date = new Date()) {
@@ -83,7 +86,7 @@ export function StudentDashboardShell({
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "STUDENT")) {
-      router.replace("/login");
+      router.replace("/login/");
     }
   }, [user, loading, router]);
 
@@ -141,7 +144,7 @@ export function StudentDashboardShell({
         type="button"
         onClick={() => {
           logout();
-          router.push("/");
+          goToWebsiteHome();
         }}
         className="mx-3 mb-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-100"
       >
@@ -164,16 +167,7 @@ export function StudentDashboardShell({
             <Menu size={20} />
           </button>
 
-          <Link href="/dashboard/student" className="flex shrink-0 items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-cyan-400 to-emerald-400 text-xs font-bold text-white shadow-sm">
-              E
-            </span>
-            <span className="font-display text-lg font-bold tracking-tight text-slate-900">
-              ELLOWRING
-            </span>
-          </Link>
-
-          <div className="mx-auto hidden w-full max-w-xl md:block">
+          <div className="mx-auto hidden w-full max-w-xl flex-1 md:block">
             <label className="relative block">
               <Search
                 size={16}

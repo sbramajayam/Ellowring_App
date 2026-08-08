@@ -5,16 +5,18 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { labelOf } from "@/lib/labels";
 
 type Course = {
   id: string;
   title: string;
-  category: string;
-  level: string;
+  category?: string | { name?: string; slug?: string } | null;
+  level?: string | null;
   price: number;
   duration?: string;
   description?: string;
   partner?: { name: string };
+  trainingCenter?: { name: string };
 };
 
 export default function CourseDetailClient() {
@@ -42,7 +44,8 @@ export default function CourseDetailClient() {
       </Link>
       <h1 className="mt-4 font-display text-4xl font-bold text-forest md:text-5xl">{course.title}</h1>
       <p className="mt-2 text-slate">
-        {course.category} · {course.level} · {course.partner?.name}
+        {labelOf(course.category, "Course")} · {labelOf(course.level, "All levels")}
+        {labelOf(course.trainingCenter ?? course.partner) ? ` · ${labelOf(course.trainingCenter ?? course.partner)}` : ""}
       </p>
       <p className="mt-6 text-lg text-slate">{course.description}</p>
       <div className="mt-8 flex items-center gap-4">

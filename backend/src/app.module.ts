@@ -21,6 +21,12 @@ import { PayrollModule } from './payroll/payroll.module';
 import { EnterpriseModule } from './enterprise/enterprise.module';
 import { AdsModule } from './ads/ads.module';
 import { PredictiveModule } from './predictive/predictive.module';
+import { StudentsModule } from './students/students.module';
+import { CollegesModule } from './colleges/colleges.module';
+import { PartnersModule } from './partners/partners.module';
+import { PaymentsModule } from './payments/payments.module';
+import { FilesModule } from './files/files.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -28,6 +34,12 @@ import { PredictiveModule } from './predictive/predictive.module';
     PrismaModule,
     AuthModule,
     UsersModule,
+    StudentsModule,
+    CollegesModule,
+    PartnersModule,
+    PaymentsModule,
+    FilesModule,
+    AnalyticsModule,
     CoursesModule,
     CoachingModule,
     JobsModule,

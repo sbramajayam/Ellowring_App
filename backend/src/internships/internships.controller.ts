@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+import { WorkMode } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('internships')
@@ -7,8 +8,10 @@ export class InternshipsController {
 
   @Get()
   list(@Query('mode') mode?: string) {
+    const workMode =
+      mode && Object.values(WorkMode).includes(mode as WorkMode) ? (mode as WorkMode) : undefined;
     return this.prisma.internship.findMany({
-      where: { isActive: true, ...(mode ? { mode } : {}) },
+      where: { isActive: true, ...(workMode ? { mode: workMode } : {}) },
       include: { company: { select: { name: true, city: true, industry: true } } },
       orderBy: { createdAt: 'desc' },
     });
@@ -16,6 +19,9 @@ export class InternshipsController {
 
   @Get(':id')
   one(@Param('id') id: string) {
-    return this.prisma.internship.findUnique({ where: { id }, include: { company: true } });
+    return this.prisma.internship.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
+      include: { company: true },
+    });
   }
 }

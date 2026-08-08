@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { labelOf } from "@/lib/labels";
 
 type Course = {
   id: string;
   title: string;
   slug: string;
-  category: string;
-  level: string;
+  category?: string | { name?: string; slug?: string } | null;
+  level?: string | null;
   price: number;
   duration?: string;
   description?: string;
@@ -32,9 +33,9 @@ export default function CoursesPage() {
         {items.map((c) => (
           <article key={c.id} className="surface rounded-3xl p-6">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-canopy">
-              <span>{c.category}</span>
+              <span>{labelOf(c.category, "Course")}</span>
               <span>·</span>
-              <span>{c.level}</span>
+              <span>{labelOf(c.level, "All levels")}</span>
             </div>
             <h2 className="mt-3 font-display text-2xl font-bold text-forest">{c.title}</h2>
             <p className="mt-2 text-slate">{c.description}</p>

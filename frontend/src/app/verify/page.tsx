@@ -14,7 +14,7 @@ export default function PublicVerifyPage() {
     setResult(null);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api"}/enterprise/verify/certificate/${encodeURIComponent(code)}`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api/v1"}/enterprise/verify/certificate/${encodeURIComponent(code)}`,
         { headers: { "X-API-Key": "ellowring-dev-enterprise-key" } },
       );
       setResult(await res.json());

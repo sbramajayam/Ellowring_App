@@ -1,22 +1,39 @@
 "use client";
 
 import { AdminShell } from "@/components/admin-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <AdminShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Student Management</h1>
-          <p className="mt-1 text-sm text-slate-500">Search and support student accounts and profiles.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Search and support student accounts and profiles."
-        />
-        <DataTable columns={["Item","Owner","Priority","Status"]} rows={[["Sample Student Management","Admin","Normal","Open"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Student Management"
+        description="All platform users (filter by STUDENT in ops)."
+        endpoint="/admin/users"
+        auth={true}
+        columns={[
+  {
+    "key": "name",
+    "label": "Name",
+    "path": "name"
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "path": "email"
+  },
+  {
+    "key": "role",
+    "label": "Role",
+    "path": "role"
+  },
+  {
+    "key": "isActive",
+    "label": "Active",
+    "path": "isActive"
+  }
+]}
+      />
     </AdminShell>
   );
 }

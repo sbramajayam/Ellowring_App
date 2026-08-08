@@ -1,0 +1,11 @@
+const fs = require("fs");
+const p = "d:/E_App/backend/prisma/schema.prisma";
+let s = fs.readFileSync(p, "utf8");
+s = s.replace(/provider\s*=\s*"postgresql"/g, 'provider = "sqlite"');
+s = s.replace(/\s*@db\.Decimal\([^)]*\)/g, "");
+s = s.replace(/\s*@db\.Date/g, "");
+fs.writeFileSync(p, s);
+const left = s.match(/@db\./g);
+console.log("provider:", (s.match(/provider\s*=\s*"[^"]+"/) || [])[0]);
+console.log("@db left:", left ? left.length : 0);
+console.log("models:", (s.match(/^model /gm) || []).length);

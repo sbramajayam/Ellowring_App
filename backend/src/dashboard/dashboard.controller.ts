@@ -14,15 +14,18 @@ export class DashboardController {
 
     if (role === 'STUDENT') {
       const student = await this.prisma.student.findUnique({ where: { userId } });
-      const [courses, coaching, apps, wallet, notifs] = await Promise.all([
+      const [courses, coaching, jobApps, internApps, wallet, notifs] = await Promise.all([
         student
-          ? this.prisma.enrollment.count({ where: { studentId: student.id } })
+          ? this.prisma.courseEnrollment.count({ where: { studentId: student.id } })
           : 0,
         student
           ? this.prisma.coachingEnrollment.count({ where: { studentId: student.id } })
           : 0,
-        this.prisma.application.count({ where: { userId } }),
-        this.prisma.wallet.findUnique({ where: { userId } }),
+        this.prisma.jobApplication.count({ where: { userId } }),
+        this.prisma.internshipApplication.count({ where: { userId } }),
+        student
+          ? this.prisma.wallet.findUnique({ where: { studentId: student.id } })
+          : null,
         this.prisma.notification.count({ where: { userId, isRead: false } }),
       ]);
       return {
@@ -30,7 +33,7 @@ export class DashboardController {
         stats: [
           { label: 'Courses', value: courses },
           { label: 'Coaching', value: coaching },
-          { label: 'Applications', value: apps },
+          { label: 'Applications', value: jobApps + internApps },
           { label: 'Wallet', value: `₹${wallet?.balance ?? 0}` },
         ],
         unread: notifs,
@@ -39,19 +42,16 @@ export class DashboardController {
 
     if (role === 'COMPANY') {
       const company = await this.prisma.company.findUnique({ where: { userId } });
-      const [jobs, internships, projects, apps] = await Promise.all([
+      const [jobs, internships, projects, jobApps, internApps] = await Promise.all([
         company ? this.prisma.job.count({ where: { companyId: company.id } }) : 0,
         company ? this.prisma.internship.count({ where: { companyId: company.id } }) : 0,
-        company ? this.prisma.liveProject.count({ where: { companyId: company.id } }) : 0,
+        company ? this.prisma.project.count({ where: { companyId: company.id } }) : 0,
         company
-          ? this.prisma.application.count({
-              where: {
-                OR: [
-                  { job: { companyId: company.id } },
-                  { internship: { companyId: company.id } },
-                  { project: { companyId: company.id } },
-                ],
-              },
+          ? this.prisma.jobApplication.count({ where: { job: { companyId: company.id } } })
+          : 0,
+        company
+          ? this.prisma.internshipApplication.count({
+              where: { internship: { companyId: company.id } },
             })
           : 0,
       ]);
@@ -61,37 +61,42 @@ export class DashboardController {
           { label: 'Jobs', value: jobs },
           { label: 'Internships', value: internships },
           { label: 'Projects', value: projects },
-          { label: 'Applicants', value: apps },
+          { label: 'Applicants', value: jobApps + internApps },
         ],
       };
     }
 
     if (role === 'COLLEGE') {
-      const college = await this.prisma.college.findUnique({ where: { userId } });
-      const admissions = college
-        ? await this.prisma.admission.count({ where: { collegeId: college.id } })
-        : 0;
+      const profile = await this.prisma.collegeProfile.findUnique({ where: { userId } });
+      const programmes = profile?.collegeId
+        ? await this.prisma.collegeCourse.count({
+            where: { collegeId: profile.collegeId, isActive: true },
+          })
+        : await this.prisma.collegeApplication.count({
+            where: profile?.collegeId ? { collegeId: profile.collegeId } : { userId },
+          });
       return {
         role,
         stats: [
-          { label: 'Open Programs', value: admissions },
-          { label: 'Verified', value: college?.verified ? 'Yes' : 'Pending' },
+          { label: 'Open Programs', value: programmes },
+          { label: 'Verified', value: profile?.verified ? 'Yes' : 'Pending' },
         ],
       };
     }
 
     if (role === 'TRAINING') {
-      const partner = await this.prisma.trainingPartner.findUnique({ where: { userId } });
-      const [courses, coaching] = await Promise.all([
-        partner ? this.prisma.course.count({ where: { partnerId: partner.id } }) : 0,
-        partner ? this.prisma.coachingModule.count({ where: { partnerId: partner.id } }) : 0,
+      const center = await this.prisma.trainingCenter.findUnique({ where: { userId } });
+      const [courses, programs, trainers] = await Promise.all([
+        center ? this.prisma.course.count({ where: { trainingCenterId: center.id } }) : 0,
+        center ? this.prisma.trainingProgram.count({ where: { trainingCenterId: center.id } }) : 0,
+        center ? this.prisma.trainer.count({ where: { trainingCenterId: center.id } }) : 0,
       ]);
       return {
         role,
         stats: [
           { label: 'Courses', value: courses },
-          { label: 'Coaching Batches', value: coaching },
-          { label: 'Trainers', value: 12 },
+          { label: 'Programs', value: programs },
+          { label: 'Trainers', value: trainers },
           { label: 'MTD Revenue', value: '₹4.8L' },
         ],
         phase: 2,
@@ -99,25 +104,28 @@ export class DashboardController {
     }
 
     if (role === 'PARTNER') {
-      const partner = await this.prisma.channelPartner.findUnique({ where: { userId } });
-      const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
+      const partner = await this.prisma.partner.findUnique({
+        where: { userId },
+        include: { wallet: true },
+      });
       return {
         role,
         stats: [
           { label: 'Referral Code', value: partner?.referralCode || '-' },
           { label: 'Commission %', value: `${partner?.commissionPct ?? 0}%` },
-          { label: 'Wallet', value: `₹${wallet?.balance ?? 0}` },
+          { label: 'Wallet', value: `₹${partner?.wallet?.balance ?? 0}` },
           { label: 'Tier', value: 'Silver' },
         ],
         phase: 2,
       };
     }
 
-    const [users, jobs, courses, apps] = await Promise.all([
+    const [users, jobs, courses, jobApps, internApps] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.job.count(),
       this.prisma.course.count(),
-      this.prisma.application.count(),
+      this.prisma.jobApplication.count(),
+      this.prisma.internshipApplication.count(),
     ]);
     return {
       role: 'ADMIN',
@@ -125,7 +133,7 @@ export class DashboardController {
         { label: 'Users', value: users },
         { label: 'Jobs', value: jobs },
         { label: 'Courses', value: courses },
-        { label: 'Applications', value: apps },
+        { label: 'Applications', value: jobApps + internApps },
       ],
     };
   }

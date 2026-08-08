@@ -48,10 +48,18 @@ export default function RegisterPage() {
     }
   }
 
-  if (authLoading || user) {
+  if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
         Loading…
+      </div>
+    );
+  }
+
+  if (user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
+        Opening your workspace…
       </div>
     );
   }

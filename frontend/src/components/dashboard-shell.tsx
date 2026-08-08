@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import { Role, useAuth } from "@/lib/auth-context";
+import { goToWebsiteHome } from "@/lib/site";
 
 const navByRole: Record<Role, { href: string; label: string; icon: any }[]> = {
   STUDENT: [
@@ -107,7 +108,7 @@ export function DashboardShell({
           <button
             onClick={() => {
               logout();
-              router.push("/");
+              goToWebsiteHome();
             }}
             className="mt-4 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-leaf/80 hover:bg-white/10"
           >

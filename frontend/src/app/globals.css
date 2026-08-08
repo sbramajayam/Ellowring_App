@@ -1,25 +1,114 @@
 @import "tailwindcss";
 
+/**
+ * Ellowring Phase 6 — Design Tokens
+ * Spec: docs/Ellowring_UI_UX_Design_System.md
+ * TS mirror: src/lib/design-tokens.ts
+ */
+
 :root {
-  --forest: #0a3d2e;
-  --canopy: #126b4f;
-  --mint: #1fad7a;
-  --leaf: #7de0b8;
-  --sun: #f0a202;
-  --ember: #e4572e;
-  --ink: #102018;
-  --slate: #3d5449;
-  --mist: #eef7f2;
-  --paper: #f7fcf9;
-  --line: #cfe6da;
-  --glow: rgba(31, 173, 122, 0.25);
-  --radius: 1rem;
-  --shadow: 0 24px 60px rgba(16, 32, 24, 0.12);
-  --font-display: var(--font-syne), system-ui, sans-serif;
-  --font-body: var(--font-dm), system-ui, sans-serif;
+  /* ── Primary brand ───────────────────────────────────────── */
+  --royal-50: #eff6ff;
+  --royal-100: #dbeafe;
+  --royal-200: #bfdbfe;
+  --royal-300: #93c5fd;
+  --royal-400: #60a5fa;
+  --royal-500: #3b82f6;
+  --royal-600: #2563eb;
+  --royal-700: #1d4ed8;
+  --royal-800: #1e40af;
+  --royal-900: #1e3a8a;
+
+  --navy-700: #123056;
+  --navy-800: #0b1f3a;
+  --navy-900: #071526;
+
+  --white: #ffffff;
+  --page: #f4f7fb;
+  --card: #ffffff;
+  --muted: #f8fafc;
+  --border: #e2e8f0;
+
+  /* Logo secondary accents */
+  --accent-red: #ef4444;
+  --accent-yellow: #f59e0b;
+  --accent-green: #10b981;
+  --accent-sky: #0ea5e9;
+  --accent-purple: #8b5cf6;
+
+  --text: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #0ea5e9;
+
+  /* Spacing / radius / elevation */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1);
+  --shadow-xl: 0 24px 48px rgba(11, 31, 58, 0.14);
+  --shadow-glow: 0 10px 30px rgba(37, 99, 235, 0.28);
+
+  --font-display: var(--font-jakarta), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Legacy aliases (marketing surfaces still referencing green theme) */
+  --forest: var(--navy-800);
+  --canopy: var(--royal-600);
+  --mint: var(--royal-500);
+  --leaf: var(--royal-300);
+  --sun: var(--accent-yellow);
+  --ember: var(--accent-red);
+  --ink: var(--text);
+  --slate: var(--text-secondary);
+  --mist: var(--royal-50);
+  --paper: var(--page);
+  --line: var(--border);
+  --glow: rgba(37, 99, 235, 0.22);
+  --radius: var(--radius-lg);
+  --shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] {
+  --page: #071526;
+  --card: #0b1f3a;
+  --muted: #123056;
+  --border: #1e3a5f;
+  --text: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --paper: #071526;
+  --mist: #123056;
+  --line: #1e3a5f;
+  --ink: #f8fafc;
+  --slate: #cbd5e1;
 }
 
 @theme inline {
+  --color-royal-50: var(--royal-50);
+  --color-royal-100: var(--royal-100);
+  --color-royal-600: var(--royal-600);
+  --color-royal-700: var(--royal-700);
+  --color-navy-800: var(--navy-800);
+  --color-page: var(--page);
+  --color-card: var(--card);
+  --color-border: var(--border);
   --color-forest: var(--forest);
   --color-canopy: var(--canopy);
   --color-mint: var(--mint);
@@ -45,8 +134,8 @@ html {
 
 body {
   margin: 0;
-  color: #0f172a;
-  background: #f4f7fb;
+  color: var(--text);
+  background: var(--page);
   font-family: var(--font-body);
   min-height: 100%;
 }
@@ -69,35 +158,40 @@ a {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  opacity: 0.35;
+  opacity: 0.28;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
 }
 
 .ring-orbit {
   background:
-    radial-gradient(circle at 50% 50%, transparent 42%, rgba(31, 173, 122, 0.2) 43%, transparent 44%),
-    radial-gradient(circle at 50% 50%, transparent 58%, rgba(240, 162, 2, 0.28) 59%, transparent 61%),
-    radial-gradient(circle at 30% 30%, rgba(125, 224, 184, 0.4), transparent 45%),
-    linear-gradient(135deg, #0a3d2e, #126b4f 50%, #0a3d2e);
+    radial-gradient(circle at 50% 50%, transparent 42%, rgba(37, 99, 235, 0.2) 43%, transparent 44%),
+    radial-gradient(circle at 50% 50%, transparent 58%, rgba(245, 158, 11, 0.25) 59%, transparent 61%),
+    radial-gradient(circle at 30% 30%, rgba(14, 165, 233, 0.28), transparent 45%),
+    linear-gradient(135deg, #0b1f3a, #2563eb 55%, #0b1f3a);
 }
 
+/* Phase 6 buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  background: var(--forest);
-  color: white;
+  border-radius: var(--radius-full);
+  background: var(--royal-600);
+  color: var(--text-inverse);
   padding: 0.85rem 1.4rem;
   font-weight: 600;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 10px 30px rgba(10, 61, 46, 0.25);
+  font-family: var(--font-display);
+  transition:
+    transform var(--motion-base) var(--ease-premium),
+    background var(--motion-base) var(--ease-premium),
+    box-shadow var(--motion-base) var(--ease-premium);
+  box-shadow: var(--shadow-glow);
 }
 
 .btn-primary:hover {
-  background: var(--canopy);
+  background: var(--royal-700);
   transform: translateY(-1px);
 }
 
@@ -106,41 +200,69 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  border: 1.5px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--ink);
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
   padding: 0.85rem 1.4rem;
   font-weight: 600;
-  backdrop-filter: blur(8px);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  font-family: var(--font-display);
+  backdrop-filter: blur(10px);
+  transition:
+    border-color var(--motion-base) var(--ease-premium),
+    transform var(--motion-base) var(--ease-premium);
 }
 
 .btn-secondary:hover {
-  border-color: var(--mint);
+  border-color: var(--royal-400);
   transform: translateY(-1px);
 }
 
 .surface {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
   backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
 }
 
 .input {
   width: 100%;
-  border: 1.5px solid var(--line);
-  border-radius: 0.85rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 0.8rem 1rem;
-  background: white;
-  color: var(--ink);
+  background: var(--white);
+  color: var(--text);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-body);
+  transition:
+    border-color var(--motion-fast) var(--ease-premium),
+    box-shadow var(--motion-fast) var(--ease-premium);
 }
 
 .input:focus {
-  border-color: var(--mint);
+  border-color: var(--royal-500);
   box-shadow: 0 0 0 4px var(--glow);
+}
+
+.ds-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  padding: 0.2rem 0.65rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--royal-50);
+  color: var(--royal-700);
 }
 
 .shine {
@@ -150,7 +272,7 @@ a {
 @keyframes floaty {
   0%,
   100% {
-    transform: translateY(0px) rotate(0deg);
+    transform: translateY(0) rotate(0deg);
   }
   50% {
     transform: translateY(-14px) rotate(2deg);
@@ -212,4 +334,3 @@ a {
 .login-float {
   animation: loginFloat 5.5s ease-in-out infinite;
 }
-

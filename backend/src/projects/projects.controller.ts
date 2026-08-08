@@ -7,15 +7,21 @@ export class ProjectsController {
 
   @Get()
   list() {
-    return this.prisma.liveProject.findMany({
+    return this.prisma.project.findMany({
       where: { isActive: true },
-      include: { company: { select: { name: true, industry: true } } },
+      include: {
+        company: { select: { name: true, industry: true } },
+        technologies: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   @Get(':id')
   one(@Param('id') id: string) {
-    return this.prisma.liveProject.findUnique({ where: { id }, include: { company: true } });
+    return this.prisma.project.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
+      include: { company: true, technologies: true, category: true },
+    });
   }
 }

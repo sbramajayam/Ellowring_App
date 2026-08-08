@@ -1,22 +1,39 @@
 "use client";
 
 import { HrShell } from "@/components/hr-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <HrShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Company Profile</h1>
-          <p className="mt-1 text-sm text-slate-500">Employer brand page, verification and hiring packages.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Employer brand page, verification and hiring packages."
-        />
-        <DataTable columns={["Item","Owner","Updated","Status"]} rows={[["Sample Company Profile","HR","Today","Open"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Company Profile"
+        description="Signed-in HR / company account."
+        endpoint="/auth/me"
+        auth={true}
+        columns={[
+  {
+    "key": "name",
+    "label": "Name",
+    "path": "name"
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "path": "email"
+  },
+  {
+    "key": "role",
+    "label": "Role",
+    "path": "role"
+  },
+  {
+    "key": "id",
+    "label": "User ID",
+    "path": "id"
+  }
+]}
+      />
     </HrShell>
   );
 }

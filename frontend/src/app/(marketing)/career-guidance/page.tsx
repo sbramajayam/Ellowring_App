@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { labelOf } from "@/lib/labels";
 
 type Item = {
   id: string;
   title: string;
-  category: string;
+  category?: string | { name?: string } | null;
   summary?: string;
   targetGrade?: string;
 };
@@ -63,7 +64,7 @@ export default function CareerPage() {
         {items.map((item) => (
           <article key={item.id} className="surface rounded-3xl p-6">
             <span className="text-xs font-semibold uppercase tracking-wide text-canopy">
-              {item.category} · {item.targetGrade}
+              {labelOf(item.category, "Career")} · {labelOf(item.targetGrade, "All")}
             </span>
             <h3 className="mt-3 font-display text-xl font-bold text-forest">{item.title}</h3>
             <p className="mt-2 text-slate">{item.summary}</p>

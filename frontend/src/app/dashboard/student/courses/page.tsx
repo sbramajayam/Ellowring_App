@@ -6,12 +6,13 @@ import { BookOpen, Loader2 } from "lucide-react";
 import { StudentShell } from "@/components/student-shell";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { labelOf } from "@/lib/labels";
 
 type Course = {
   id: string;
   title: string;
-  category: string;
-  level: string;
+  category?: string | { name?: string; slug?: string } | null;
+  level?: string | null;
   duration?: string | null;
   price: number;
   description?: string | null;
@@ -22,6 +23,8 @@ export default function StudentCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +63,11 @@ export default function StudentCoursesPage() {
             {error}
           </p>
         )}
+        {msg && (
+          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-100">
+            {msg}
+          </p>
+        )}
 
         {!loading && !error && (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,7 +80,7 @@ export default function StudentCoursesPage() {
                   <BookOpen size={20} />
                 </div>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                  {c.category} · {c.level}
+                  {labelOf(c.category, "Course")} · {labelOf(c.level, "All levels")}
                 </p>
                 <h2 className="mt-1 text-base font-bold text-slate-900">{c.title}</h2>
                 <p className="mt-2 line-clamp-2 flex-1 text-sm text-slate-500">
@@ -80,15 +88,32 @@ export default function StudentCoursesPage() {
                 </p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-sm font-bold text-slate-900">
-                    {c.price > 0 ? `₹${c.price.toLocaleString("en-IN")}` : "Free"}
+                    {Number(c.price) > 0 ? `₹${Number(c.price).toLocaleString("en-IN")}` : "Free"}
                   </span>
                   <span className="text-xs text-slate-400">{c.duration || "Self-paced"}</span>
                 </div>
                 <button
                   type="button"
-                  className="mt-3 w-full rounded-xl bg-[#2563EB] py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                  disabled={!!busyId}
+                  className="mt-3 w-full rounded-xl bg-[#2563EB] py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                  onClick={async () => {
+                    if (!token) {
+                      setError("Sign in required.");
+                      return;
+                    }
+                    try {
+                      setBusyId(c.id);
+                      setError("");
+                      await api(`/courses/${c.id}/enroll`, { method: "POST", token });
+                      setMsg(`Enrolled in ${c.title}`);
+                    } catch (e) {
+                      setError(e instanceof Error ? e.message : "Enroll failed");
+                    } finally {
+                      setBusyId(null);
+                    }
+                  }}
                 >
-                  Enroll
+                  {busyId === c.id ? "Enrolling…" : "Enroll"}
                 </button>
               </article>
             ))}

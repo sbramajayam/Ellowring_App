@@ -10,7 +10,7 @@ export default function AdminEnterpriseApiPage() {
 
   async function ping() {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api"}/enterprise/health`,
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api/v1"}/enterprise/health`,
       { headers: { "X-API-Key": "ellowring-dev-enterprise-key" } },
     );
     setResult(JSON.stringify(await res.json(), null, 2));
@@ -18,7 +18,7 @@ export default function AdminEnterpriseApiPage() {
 
   async function verify() {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api"}/enterprise/verify/certificate/${encodeURIComponent(code)}`,
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/api/v1"}/enterprise/verify/certificate/${encodeURIComponent(code)}`,
       { headers: { "X-API-Key": "ellowring-dev-enterprise-key" } },
     );
     setResult(JSON.stringify(await res.json(), null, 2));

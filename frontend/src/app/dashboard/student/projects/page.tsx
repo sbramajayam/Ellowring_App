@@ -5,19 +5,25 @@ import Link from "next/link";
 import { Layers, Users } from "lucide-react";
 import { StudentShell } from "@/components/student-shell";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
+import { labelOf, moneyOf } from "@/lib/labels";
 
 type Project = {
   id: string;
   title: string;
   description?: string;
+  duration?: string;
   durationWeeks?: number;
-  stipend?: number;
+  stipend?: number | string;
   skills?: string;
+  technologies?: { technology?: string; name?: string }[];
   company?: { name: string; industry?: string };
 };
 
 export default function StudentProjectsPage() {
+  const { token } = useAuth();
   const [items, setItems] = useState<Project[]>([]);
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
     api<Project[]>("/projects").then(setItems).catch(console.error);
@@ -44,6 +50,11 @@ export default function StudentProjectsPage() {
             Back to Dashboard
           </Link>
         </div>
+        {msg && (
+          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-100">
+            {msg}
+          </p>
+        )}
 
         <div className="grid gap-3 sm:grid-cols-3">
           {[
@@ -90,29 +101,49 @@ export default function StudentProjectsPage() {
                 <div className="min-w-0 flex-1">
                   <h2 className="font-bold text-slate-900">{p.title}</h2>
                   <p className="mt-1 text-xs text-slate-500">
-                    {p.company?.name || "Partner company"}
-                    {p.company?.industry ? ` · ${p.company.industry}` : ""}
+                    {labelOf(p.company, "Partner company")}
+                    {p.company?.industry ? ` · ${labelOf(p.company.industry)}` : ""}
                   </p>
                 </div>
               </div>
               <p className="mt-3 line-clamp-3 text-sm text-slate-600">
-                {p.description || "Industry live project with mentor reviews and deliverables."}
+                {labelOf(p.description, "Industry live project with mentor reviews and deliverables.")}
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-slate-600">
                 <span className="rounded-lg bg-slate-50 px-2 py-1 ring-1 ring-slate-100">
-                  {p.durationWeeks || 6} weeks
+                  {labelOf(p.duration, p.durationWeeks ? `${p.durationWeeks} weeks` : "6–8 weeks")}
                 </span>
                 <span className="rounded-lg bg-slate-50 px-2 py-1 ring-1 ring-slate-100">
-                  Stipend ₹{p.stipend ?? 0}
+                  Stipend ₹{moneyOf(p.stipend, "0")}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-blue-700 ring-1 ring-blue-100">
                   <Users size={12} /> Team + mentor
                 </span>
               </div>
-              <p className="mt-3 text-xs text-slate-400">{p.skills || "Skills listed by company"}</p>
+              <p className="mt-3 text-xs text-slate-400">
+                {p.technologies?.length
+                  ? p.technologies.map((t) => labelOf(t.technology ?? t.name ?? t)).filter(Boolean).join(", ")
+                  : labelOf(p.skills, "Skills listed by company")}
+              </p>
               <button
                 type="button"
                 className="mt-4 w-full rounded-xl bg-[#2563EB] py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                onClick={async () => {
+                  try {
+                    if (!token) {
+                      setMsg("Sign in required.");
+                      return;
+                    }
+                    await api("/applications", {
+                      method: "POST",
+                      token,
+                      body: JSON.stringify({ projectId: p.id }),
+                    });
+                    setMsg(`Applied to ${p.title}`);
+                  } catch (e) {
+                    setMsg(e instanceof Error ? e.message : "Apply failed");
+                  }
+                }}
               >
                 Apply to project
               </button>

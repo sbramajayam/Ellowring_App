@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards, Req, Query } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -9,8 +9,20 @@ export class CoursesController {
   @Get()
   list(@Query('category') category?: string) {
     return this.prisma.course.findMany({
-      where: { isPublished: true, ...(category ? { category } : {}) },
-      include: { partner: { select: { name: true } } },
+      where: {
+        isPublished: true,
+        ...(category
+          ? {
+              category: {
+                OR: [{ slug: category }, { name: category }],
+              },
+            }
+          : {}),
+      },
+      include: {
+        category: { select: { name: true, slug: true } },
+        trainingCenter: { select: { name: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -19,7 +31,11 @@ export class CoursesController {
   one(@Param('slug') slug: string) {
     return this.prisma.course.findUnique({
       where: { slug },
-      include: { partner: { select: { name: true, specialty: true } } },
+      include: {
+        category: true,
+        trainingCenter: { select: { name: true, specialty: true } },
+        modules: { include: { lessons: true }, orderBy: { sortOrder: 'asc' } },
+      },
     });
   }
 
@@ -28,10 +44,10 @@ export class CoursesController {
   async enroll(@Param('id') id: string, @Req() req: any) {
     const student = await this.prisma.student.findUnique({ where: { userId: req.user.userId } });
     if (!student) return { error: 'Student profile required' };
-    return this.prisma.enrollment.upsert({
+    return this.prisma.courseEnrollment.upsert({
       where: { studentId_courseId: { studentId: student.id, courseId: id } },
       update: {},
-      create: { studentId: student.id, courseId: id },
+      create: { studentId: student.id, courseId: id, progressPct: 0 },
     });
   }
 }

@@ -143,13 +143,6 @@ export function RoleShell({
               <Menu size={18} />
             </button>
 
-            <Link href="/" className="hidden shrink-0 lg:block" aria-label="Ellowring home">
-              <EllowringLogo variant="horizontal" size="md" />
-            </Link>
-            <Link href="/" className="shrink-0 lg:hidden" aria-label="Ellowring home">
-              <EllowringLogo variant="horizontal" size="sm" />
-            </Link>
-
             <div className="relative mx-auto hidden min-w-0 w-full max-w-xl flex-1 md:block">
               <Search
                 className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"

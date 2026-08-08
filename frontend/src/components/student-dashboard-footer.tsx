@@ -1,24 +1,22 @@
 "use client";
 
 import { BarChart3, Network, Shield } from "lucide-react";
-import { EllowringMark } from "@/components/ellowring-logo";
 
 /** Dashboard footer brand bar — padding, borders, dividers matched to WWW mockup */
 export function StudentDashboardFooter() {
+  const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/brand/ellowring-logo.png`;
+
   return (
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto flex max-w-[1440px] flex-col lg:flex-row lg:items-stretch">
-        {/* 1 — Logo */}
-        <div className="flex items-center gap-2.5 border-b border-slate-100 px-5 py-4 lg:min-w-[210px] lg:shrink-0 lg:border-b-0 lg:border-r lg:border-slate-200 lg:px-6 lg:py-5">
-          <EllowringMark className="h-9 w-9" />
-          <div className="min-w-0 leading-[1.05]">
-            <div className="text-[14px] font-extrabold tracking-[0.02em] text-[#0B1F3A]">
-              ELLOWRING
-            </div>
-            <div className="text-[7.5px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Software Solutions
-            </div>
-          </div>
+        {/* 1 — Official brand PNG (mark + ELLOWRING SOFTWARE SOLUTIONS) */}
+        <div className="flex items-center border-b border-slate-100 px-5 py-3 lg:min-w-[200px] lg:shrink-0 lg:border-b-0 lg:border-r lg:border-slate-200 lg:px-5 lg:py-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoSrc}
+            alt="Ellowring Software Solutions"
+            className="h-[64px] w-auto max-w-[180px] object-contain object-left"
+          />
         </div>
 
         {/* 2 — AI-Powered */}

@@ -1,3 +1,7 @@
+// Ellowring Phase-4 PostgreSQL Schema
+// Compatible with docs/Ellowring_Database_Design.md
+// Swap: set DATABASE_URL to postgres, replace root schema.prisma with this, npx prisma migrate dev
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,6 +11,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
 enum Role {
   STUDENT
   COLLEGE
@@ -14,6 +20,29 @@ enum Role {
   TRAINING
   PARTNER
   ADMIN
+}
+
+enum AdmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  INTERVIEW
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+  WITHDRAWN
+}
+
+enum AbroadApplicationStatus {
+  DRAFT
+  SUBMITTED
+  DOCUMENTS_PENDING
+  UNDER_REVIEW
+  VISA_PROCESSING
+  APPROVED
+  REJECTED
+  WITHDRAWN
 }
 
 enum ApplicationStatus {
@@ -27,9 +56,41 @@ enum ApplicationStatus {
 
 enum PaymentStatus {
   PENDING
+  PROCESSING
   SUCCESS
   FAILED
   REFUNDED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  REFUND
+  ADJUSTMENT
+}
+
+enum WalletLedgerType {
+  CREDIT
+  DEBIT
+  HOLD
+  RELEASE
 }
 
 enum NotificationType {
@@ -40,70 +101,1053 @@ enum NotificationType {
   SYSTEM
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  phone         String?
-  passwordHash  String
-  name          String
-  role          Role      @default(STUDENT)
-  avatarUrl     String?
-  isVerified    Boolean   @default(false)
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  student       Student?
-  college       College?
-  company       Company?
-  training      TrainingPartner?
-  partner       ChannelPartner?
-  wallet        Wallet?
-  notifications Notification[]
-  otps          Otp[]
-  applications  Application[]
-  payments      Payment[]
-  coupons       CouponRedemption[]
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+  WHATSAPP
 }
 
-model Otp {
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  FREELANCE
+}
+
+enum WorkMode {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum InternshipOfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  REVOKED
+}
+
+enum JobOfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  REVOKED
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+}
+
+enum PayrollRunStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum QuestionType {
+  MCQ
+  TRUE_FALSE
+  SHORT_ANSWER
+  NUMERIC
+  ESSAY
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum ProjectSubmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  REVISION_REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum OtpPurpose {
+  LOGIN
+  REGISTER
+  RESET_PASSWORD
+  VERIFY_EMAIL
+  VERIFY_PHONE
+  TWO_FACTOR
+}
+
+enum BookmarkEntityType {
+  COURSE
+  COLLEGE
+  JOB
+  INTERNSHIP
+  PROJECT
+  COACHING_PROGRAM
+  ABROAD_PROGRAM
+  ARTICLE
+}
+
+enum FavoriteEntityType {
+  COURSE
+  COLLEGE
+  JOB
+  INTERNSHIP
+  PROJECT
+  COACHING_PROGRAM
+  TRAINER
+  COMPANY
+}
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  phone        String?   @unique
+  passwordHash String
+  name         String
+  role         Role      @default(STUDENT)
+  avatarUrl    String?
+  isVerified   Boolean   @default(false)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  student         Student?
+  collegeProfile  CollegeProfile?
+  company         Company?
+  trainingCenter  TrainingCenter?
+  partner         Partner?
+  hrUser          HrUser?
+
+  sessions         Session[]
+  refreshTokens    RefreshToken[]
+  otpVerifications OtpVerification[]
+  passwordResets   PasswordReset[]
+  auditLogs        AuditLog[]
+  rbacAssignments  UserRbacRole[]
+
+  notifications      Notification[]
+  payments           Payment[]
+  subscriptions      Subscription[]
+  supportTickets     SupportTicket[]     @relation("TicketRequester")
+  assignedTickets    SupportTicket[]     @relation("TicketAssignee")
+  couponRedemptions  CouponRedemption[]
+  abroadApplications AbroadApplication[]
+  collegeApplications CollegeApplication[]
+  jobApplications    JobApplication[]
+  internshipApplications InternshipApplication[]
+  savedJobs          SavedJob[]
+  emailLogs          EmailLog[]
+  smsLogs            SmsLog[]
+  pushNotifications  PushNotification[]
+  whatsappLogs       WhatsappLog[]
+
+  @@index([role])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model RbacRole {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  isSystem    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  permissions RbacRolePermission[]
+  users       UserRbacRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  module      String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  roles RbacRolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model RbacRolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       RbacRole   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model UserRbacRole {
   id        String   @id @default(cuid())
-  code      String
-  purpose   String
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role RbacRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_rbac_roles")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
   expiresAt DateTime
-  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model OtpVerification {
+  id        String     @id @default(cuid())
   userId    String?
   email     String?
   phone     String?
-  createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id])
+  code      String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  used      Boolean    @default(false)
+  usedAt    DateTime?
+  createdAt DateTime   @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([email])
+  @@index([phone])
+  @@index([expiresAt])
+  @@map("otp_verifications")
 }
 
-model Student {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grade           String?
-  stream          String?
-  schoolName      String?
-  collegeName     String?
-  city            String?
-  state           String?
-  careerInterest  String?
-  resumeUrl       String?
-  bio             String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
-  enrollments     Enrollment[]
-  coachingEnrolls CoachingEnrollment[]
-  certificates    Certificate[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_resets")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─── STUDENT ─────────────────────────────────────────────────────────────────
+
+model Student {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  dateOfBirth DateTime?
+  gender      String?
+  grade       String?
+  stream      String?
+  city        String?
+  state       String?
+  country     String?   @default("IN")
+  bio         String?
+  resumeUrl   String?
+  linkedinUrl String?
+  githubUrl   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parents               Parent[]
+  educationHistory      EducationHistory[]
+  careerInterests       CareerInterest[]
+  careerRecommendations CareerRecommendation[]
+  studentSkills         StudentSkill[]
+  skillProgress         SkillProgress[]
+  achievements          Achievement[]
+  wallet                Wallet?
+  certificates          Certificate[]
+  bookmarks             Bookmark[]
+  favorites             Favorite[]
+
+  coachingEnrollments   CoachingEnrollment[]
+  courseEnrollments     CourseEnrollment[]
+  studentAnswers        StudentAnswer[]
+  mockResults           MockResult[]
+  leaderboardEntries    LeaderboardEntry[]
+  internshipApplications InternshipApplication[]
+  internshipProgress    InternshipProgress[]
+  internshipFeedback    InternshipFeedback[]
+  projectTeamMembers    ProjectTeamMember[]
+  projectSubmissions    ProjectSubmission[]
+  trainingAssignments   TrainingAssignment[]
+  attendanceRecords     AttendanceRecord[]
+
+  @@index([city, state])
+  @@index([deletedAt])
+  @@map("students")
+}
+
+model Parent {
+  id           String    @id @default(cuid())
+  studentId    String
+  name         String
+  relation     String
+  email        String?
+  phone        String?
+  occupation   String?
+  isPrimary    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("parents")
+}
+
+model EducationHistory {
+  id           String    @id @default(cuid())
+  studentId    String
+  institution  String
+  degree       String?
+  fieldOfStudy String?
+  startYear    Int?
+  endYear      Int?
+  grade        String?
+  description  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("education_history")
+}
+
+model CareerInterest {
+  id        String    @id @default(cuid())
+  studentId String
+  title     String
+  category  String?
+  priority  Int       @default(1)
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  recommendations CareerRecommendation[]
+
+  @@index([studentId])
+  @@map("career_interests")
+}
+
+model CareerRecommendation {
+  id               String    @id @default(cuid())
+  studentId        String
+  careerInterestId String?
+  title            String
+  summary          String?
+  confidence       Decimal? 
+  source           String?
+  metadata         Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  student        Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  careerInterest CareerInterest? @relation(fields: [careerInterestId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
+  @@index([careerInterestId])
+  @@map("career_recommendations")
+}
+
+model Skill {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  category    String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  studentSkills StudentSkill[]
+  skillProgress SkillProgress[]
+
+  @@index([category])
+  @@map("skills")
+}
+
+model StudentSkill {
+  id           String    @id @default(cuid())
+  studentId    String
+  skillId      String
+  level        Int       @default(1)
+  yearsOfExp   Decimal? 
+  verified     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, skillId])
+  @@index([studentId])
+  @@index([skillId])
+  @@map("student_skills")
+}
+
+model SkillProgress {
+  id          String    @id @default(cuid())
+  studentId   String
+  skillId     String
+  progressPct Int       @default(0)
+  source      String?
+  notes       String?
+  recordedAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([skillId])
+  @@map("skill_progress")
+}
+
+model Achievement {
+  id          String    @id @default(cuid())
+  studentId   String
+  title       String
+  description String?
+  issuer      String?
+  achievedAt  DateTime?
+  badgeUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("achievements")
+}
+
+model Wallet {
+  id        String    @id @default(cuid())
+  studentId String    @unique
+  balance   Decimal   @default(0)
+  currency  String    @default("INR")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  student Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  ledger  WalletLedger[]
+
+  @@map("wallets")
+}
+
+model WalletLedger {
+  id          String           @id @default(cuid())
+  walletId    String
+  amount      Decimal         
+  type        WalletLedgerType
+  reference   String?
+  description String?
+  balanceAfter Decimal?       
+  createdAt   DateTime         @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+  @@index([createdAt])
+  @@map("wallet_ledger")
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  title         String?
+  discountPct   Decimal? 
+  discountAmt   Decimal? 
+  minOrderAmt   Decimal? 
+  maxUses       Int       @default(100)
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  createdById   String?
+  updatedById   String?
+
+  redemptions CouponRedemption[]
+
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String
+  orderRef  String?
+  createdAt DateTime @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId])
+  @@index([couponId])
+  @@index([userId])
+  @@map("coupon_redemptions")
+}
+
+model Certificate {
+  id           String    @id @default(cuid())
+  studentId    String
+  title        String
+  issuer       String
+  credentialId String?
+  fileUrl      String?
+  issuedAt     DateTime  @default(now())
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("certificates")
+}
+
+model Bookmark {
+  id         String             @id @default(cuid())
+  studentId  String
+  entityType BookmarkEntityType
+  entityId   String
+  notes      String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, entityType, entityId])
+  @@index([studentId])
+  @@index([entityType, entityId])
+  @@map("bookmarks")
+}
+
+model Favorite {
+  id         String             @id @default(cuid())
+  studentId  String
+  entityType FavoriteEntityType
+  entityId   String
+  createdAt  DateTime           @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, entityType, entityId])
+  @@index([studentId])
+  @@index([entityType, entityId])
+  @@map("favorites")
+}
+
+// ─── COACHING ──────────────────────────────────────────────────────────────────
+
+model CoachingCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  iconUrl     String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  programs CoachingProgram[]
+
+  @@map("coaching_categories")
+}
+
+model CoachingProgram {
+  id          String    @id @default(cuid())
+  categoryId  String
+  title       String
+  slug        String    @unique
+  examType    String
+  description String?
+  price       Decimal   @default(0)
+  duration    String?
+  batchSize   Int?
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  category    CoachingCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subjects    Subject[]
+  mockTests   MockTest[]
+  enrollments CoachingEnrollment[]
+
+  @@index([categoryId])
+  @@index([examType])
+  @@index([isPublished])
+  @@map("coaching_programs")
+}
+
+model CoachingEnrollment {
+  id        String           @id @default(cuid())
+  studentId String
+  programId String
+  status    EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime        @default(now())
+  completedAt DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  student Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  program CoachingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, programId])
+  @@index([studentId])
+  @@index([programId])
+  @@map("coaching_enrollments")
+}
+
+model Subject {
+  id          String    @id @default(cuid())
+  programId   String
+  name        String
+  slug        String
+  description String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  program  CoachingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  chapters Chapter[]
+
+  @@unique([programId, slug])
+  @@index([programId])
+  @@map("subjects")
+}
+
+model Chapter {
+  id          String    @id @default(cuid())
+  subjectId   String
+  title       String
+  slug        String
+  description String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  subject Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@unique([subjectId, slug])
+  @@index([subjectId])
+  @@map("chapters")
+}
+
+model Lesson {
+  id          String    @id @default(cuid())
+  chapterId   String
+  title       String
+  slug        String
+  content     String?
+  videoUrl    String?
+  durationMin Int?
+  sortOrder   Int       @default(0)
+  isFree      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  topics  Topic[]
+
+  @@unique([chapterId, slug])
+  @@index([chapterId])
+  @@map("lessons")
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  lessonId    String
+  title       String
+  content     String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@map("topics")
+}
+
+model QuestionBank {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  examType    String?
+  description String?
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  questions Question[]
+  mockTests MockTest[]
+
+  @@index([examType])
+  @@map("question_banks")
+}
+
+model MockTest {
+  id            String    @id @default(cuid())
+  programId     String?
+  questionBankId String?
+  title         String
+  slug          String    @unique
+  durationMin   Int
+  totalMarks    Int
+  passingMarks  Int?
+  isPublished   Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  program      CoachingProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  questionBank QuestionBank?    @relation(fields: [questionBankId], references: [id], onDelete: SetNull)
+  questions    Question[]
+  results      MockResult[]
+  leaderboard  LeaderboardEntry[]
+
+  @@index([programId])
+  @@index([questionBankId])
+  @@map("mock_tests")
+}
+
+model Question {
+  id             String          @id @default(cuid())
+  questionBankId String?
+  mockTestId     String?
+  text           String
+  type           QuestionType    @default(MCQ)
+  difficulty     DifficultyLevel @default(MEDIUM)
+  marks          Int             @default(1)
+  explanation    String?
+  sortOrder      Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+
+  questionBank QuestionBank?    @relation(fields: [questionBankId], references: [id], onDelete: SetNull)
+  mockTest     MockTest?        @relation(fields: [mockTestId], references: [id], onDelete: SetNull)
+  options      QuestionOption[]
+  answers      StudentAnswer[]
+
+  @@index([questionBankId])
+  @@index([mockTestId])
+  @@map("questions")
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  label      String
+  text       String
+  isCorrect  Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  question Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  StudentAnswer[]
+
+  @@index([questionId])
+  @@map("question_options")
+}
+
+model StudentAnswer {
+  id               String   @id @default(cuid())
+  studentId        String
+  questionId       String
+  selectedOptionId String?
+  textAnswer       String?
+  isCorrect        Boolean?
+  marksAwarded     Decimal?
+  answeredAt       DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  student        Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  question       Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption QuestionOption? @relation(fields: [selectedOptionId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
+  @@index([questionId])
+  @@map("student_answers")
+}
+
+model MockResult {
+  id          String   @id @default(cuid())
+  studentId   String
+  mockTestId  String
+  score       Decimal 
+  totalMarks  Int
+  percentile  Decimal?
+  timeTakenSec Int?
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mockTest MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, mockTestId])
+  @@index([studentId])
+  @@index([mockTestId])
+  @@map("mock_results")
+}
+
+model LeaderboardEntry {
+  id         String   @id @default(cuid())
+  studentId  String
+  mockTestId String
+  rank       Int
+  score      Decimal 
+  period     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mockTest MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, mockTestId, period])
+  @@index([mockTestId, rank])
+  @@index([studentId])
+  @@map("leaderboard_entries")
+}
+
+// ─── COLLEGE ───────────────────────────────────────────────────────────────────
+
+model School {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  board       String?
+  city        String?
+  state       String?
+  country     String?   @default("IN")
+  website     String?
+  description String?
+  logoUrl     String?
+  isVerified  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([city, state])
+  @@map("schools")
+}
+
+model University {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  city        String?
+  state       String?
+  country     String?   @default("IN")
+  website     String?
+  description String?
+  logoUrl     String?
+  isVerified  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  colleges College[]
+
+  @@index([city, state])
+  @@map("universities")
 }
 
 model College {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  universityId String?
+  name         String
+  slug         String    @unique
+  code         String?
+  type         String?
+  city         String?
+  state        String?
+  country      String?   @default("IN")
+  website      String?
+  description  String?
+  logoUrl      String?
+  isVerified   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  university   University?         @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  departments  Department[]
+  courses      CollegeCourse[]
+  rankings     CollegeRanking[]
+  reviews      CollegeReview[]
+  applications CollegeApplication[]
+  scholarships Scholarship[]
+
+  @@index([universityId])
+  @@index([city, state])
+  @@index([isVerified])
+  @@map("colleges")
+}
+
+model CollegeProfile {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  collegeId   String?
   name        String
   code        String?
   city        String?
@@ -112,318 +1156,1633 @@ model College {
   website     String?
   description String?
   logoUrl     String?
-  verified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  verified    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
-  admissions  Admission[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([collegeId])
+  @@map("college_profiles")
 }
 
+model Department {
+  id          String    @id @default(cuid())
+  collegeId   String
+  name        String
+  slug        String
+  headName    String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  college College         @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  courses CollegeCourse[]
+
+  @@unique([collegeId, slug])
+  @@index([collegeId])
+  @@map("departments")
+}
+
+model CollegeCourse {
+  id           String    @id @default(cuid())
+  collegeId    String
+  departmentId String?
+  name         String
+  slug         String
+  degree       String
+  duration     String?
+  fees         Decimal? 
+  seats        Int       @default(0)
+  eligibility  String?
+  description  String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  college      College              @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  department   Department?          @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  applications CollegeApplication[]
+  scholarships Scholarship[]
+
+  @@unique([collegeId, slug])
+  @@index([collegeId])
+  @@index([departmentId])
+  @@map("college_courses")
+}
+
+model CollegeRanking {
+  id        String    @id @default(cuid())
+  collegeId String
+  source    String
+  rank      Int
+  year      Int
+  category  String?
+  score     Decimal? 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@unique([collegeId, source, year, category])
+  @@index([collegeId])
+  @@index([year, rank])
+  @@map("college_rankings")
+}
+
+model CollegeReview {
+  id        String    @id @default(cuid())
+  collegeId String
+  userId    String?
+  rating    Int
+  title     String?
+  content   String?
+  isVerified Boolean  @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@index([collegeId])
+  @@index([rating])
+  @@map("college_reviews")
+}
+
+model CollegeApplication {
+  id              String          @id @default(cuid())
+  userId          String
+  collegeId       String
+  courseId        String?
+  status          AdmissionStatus @default(DRAFT)
+  applicationNo   String?         @unique
+  documents       Json?
+  submittedAt     DateTime?
+  decisionAt      DateTime?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college College        @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  course  CollegeCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([collegeId])
+  @@index([courseId])
+  @@index([status])
+  @@map("college_applications")
+}
+
+model Scholarship {
+  id          String    @id @default(cuid())
+  collegeId   String?
+  courseId    String?
+  title       String
+  amount      Decimal? 
+  percentage  Decimal? 
+  eligibility String?
+  deadline    DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  college College?       @relation(fields: [collegeId], references: [id], onDelete: SetNull)
+  course  CollegeCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  @@index([collegeId])
+  @@index([courseId])
+  @@index([deadline])
+  @@map("scholarships")
+}
+
+// ─── STUDY ABROAD ──────────────────────────────────────────────────────────────
+
+model Country {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  code      String    @unique
+  currency  String?
+  flagUrl   String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  universities AbroadUniversity[]
+  visaRules    VisaRequirement[]
+
+  @@map("countries")
+}
+
+model AbroadUniversity {
+  id          String    @id @default(cuid())
+  countryId   String
+  name        String
+  slug        String    @unique
+  city        String?
+  ranking     Int?
+  website     String?
+  description String?
+  logoUrl     String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  country  Country         @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  programs AbroadProgram[]
+
+  @@index([countryId])
+  @@map("abroad_universities")
+}
+
+model AbroadProgram {
+  id           String    @id @default(cuid())
+  universityId String
+  name         String
+  slug         String    @unique
+  degree       String
+  duration     String?
+  tuition      Decimal? 
+  currency     String?   @default("USD")
+  intake       String?
+  description  String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  university   AbroadUniversity    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  eligibility  EligibilityRule[]
+  applications AbroadApplication[]
+
+  @@index([universityId])
+  @@map("abroad_programs")
+}
+
+model EligibilityRule {
+  id          String    @id @default(cuid())
+  programId   String
+  ruleType    String
+  ruleValue   String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  program AbroadProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@map("eligibility_rules")
+}
+
+model VisaRequirement {
+  id          String    @id @default(cuid())
+  countryId   String
+  visaType    String
+  requirements String?
+  processingDays Int?
+  fee         Decimal? 
+  currency    String?   @default("USD")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@index([countryId])
+  @@map("visa_requirements")
+}
+
+model AbroadApplication {
+  id            String                  @id @default(cuid())
+  userId        String
+  programId     String
+  status        AbroadApplicationStatus @default(DRAFT)
+  applicationNo String?                 @unique
+  submittedAt   DateTime?
+  decisionAt    DateTime?
+  notes         String?
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+  deletedAt     DateTime?
+
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program   AbroadProgram     @relation(fields: [programId], references: [id], onDelete: Cascade)
+  documents AbroadDocument[]
+
+  @@index([userId])
+  @@index([programId])
+  @@index([status])
+  @@map("abroad_applications")
+}
+
+model AbroadDocument {
+  id            String    @id @default(cuid())
+  applicationId String
+  docType       String
+  fileName      String
+  fileUrl       String
+  verified      Boolean   @default(false)
+  uploadedAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  application AbroadApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("abroad_documents")
+}
+
+// ─── LEARNING ──────────────────────────────────────────────────────────────────
+
+model CourseCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  iconUrl     String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  courses Course[]
+
+  @@map("course_categories")
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  categoryId  String
+  trainingCenterId String?
+  title       String
+  slug        String    @unique
+  level       String
+  duration    String?
+  price       Decimal   @default(0)
+  currency    String    @default("INR")
+  description String?
+  thumbnail   String?
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  category       CourseCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  trainingCenter TrainingCenter?     @relation(fields: [trainingCenterId], references: [id], onDelete: SetNull)
+  modules        CourseModule[]
+  assignments    Assignment[]
+  assessments    Assessment[]
+  certificates   CourseCertificate[]
+  downloads      CourseDownload[]
+  enrollments    CourseEnrollment[]
+
+  @@index([categoryId])
+  @@index([trainingCenterId])
+  @@index([isPublished])
+  @@map("courses")
+}
+
+model CourseModule {
+  id          String    @id @default(cuid())
+  courseId    String
+  title       String
+  slug        String
+  description String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  course  Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons CourseLesson[]
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@map("course_modules")
+}
+
+model CourseLesson {
+  id          String    @id @default(cuid())
+  moduleId    String
+  title       String
+  slug        String
+  content     String?
+  durationMin Int?
+  sortOrder   Int       @default(0)
+  isFree      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  module CourseModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  videos CourseVideo[]
+
+  @@unique([moduleId, slug])
+  @@index([moduleId])
+  @@map("course_lessons")
+}
+
+model CourseVideo {
+  id        String    @id @default(cuid())
+  lessonId  String
+  title     String
+  videoUrl  String
+  durationSec Int?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  lesson CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@map("course_videos")
+}
+
+model Assignment {
+  id          String    @id @default(cuid())
+  courseId    String
+  title       String
+  description String?
+  dueDate     DateTime?
+  maxScore    Int       @default(100)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@map("assignments")
+}
+
+model Assessment {
+  id          String    @id @default(cuid())
+  courseId    String
+  title       String
+  description String?
+  durationMin Int?
+  maxScore    Int       @default(100)
+  passingScore Int      @default(40)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@map("assessments")
+}
+
+model CourseCertificate {
+  id           String    @id @default(cuid())
+  courseId     String
+  enrollmentId String?   @unique
+  templateUrl  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  course     Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment CourseEnrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+  @@index([courseId])
+  @@map("course_certificates")
+}
+
+model CourseDownload {
+  id        String    @id @default(cuid())
+  courseId  String
+  title     String
+  fileUrl   String
+  fileSize  Int?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@map("course_downloads")
+}
+
+model CourseEnrollment {
+  id          String           @id @default(cuid())
+  studentId   String
+  courseId    String
+  status      EnrollmentStatus @default(ACTIVE)
+  progressPct Int              @default(0)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  student     Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course      Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  certificate CourseCertificate?
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+// ─── INTERNSHIP (Company shared) ───────────────────────────────────────────────
+
 model Company {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  userId      String    @unique
   name        String
   industry    String?
   size        String?
   city        String?
+  state       String?
   website     String?
   description String?
   logoUrl     String?
-  verified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  verified    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
-  jobs        Job[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   internships Internship[]
-  projects    LiveProject[]
-}
+  projects    Project[]
+  jobs        Job[]
+  hrUsers     HrUser[]
+  employees   Employee[]
+  mentors     Mentor[]
 
-model TrainingPartner {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  specialty   String?
-  city        String?
-  website     String?
-  description String?
-  logoUrl     String?
-  verified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  courses     Course[]
-  coaching    CoachingModule[]
-}
-
-model ChannelPartner {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  region      String?
-  referralCode String  @unique
-  commissionPct Float  @default(10)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Course {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  category    String
-  level       String
-  duration    String?
-  price       Float    @default(0)
-  description String?
-  thumbnail   String?
-  isPublished Boolean  @default(true)
-  partnerId   String?
-  partner     TrainingPartner? @relation(fields: [partnerId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  enrollments Enrollment[]
-}
-
-model Enrollment {
-  id         String   @id @default(cuid())
-  studentId  String
-  courseId   String
-  progress   Int      @default(0)
-  status     String   @default("ACTIVE")
-  enrolledAt DateTime @default(now())
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, courseId])
-}
-
-model CoachingModule {
-  id          String   @id @default(cuid())
-  title       String
-  examType    String
-  description String?
-  price       Float    @default(0)
-  duration    String?
-  batchSize   Int?
-  isPublished Boolean  @default(true)
-  partnerId   String?
-  partner     TrainingPartner? @relation(fields: [partnerId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  enrollments CoachingEnrollment[]
-}
-
-model CoachingEnrollment {
-  id         String         @id @default(cuid())
-  studentId  String
-  coachingId String
-  status     String         @default("ACTIVE")
-  enrolledAt DateTime       @default(now())
-  student    Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  coaching   CoachingModule @relation(fields: [coachingId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, coachingId])
-}
-
-model CareerGuidance {
-  id          String   @id @default(cuid())
-  title       String
-  category    String
-  summary     String?
-  content     String?
-  targetGrade String?
-  isPublished Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Admission {
-  id          String   @id @default(cuid())
-  collegeId   String
-  college     College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
-  program     String
-  stream      String?
-  seats       Int      @default(0)
-  fees        Float?
-  deadline    DateTime?
-  description String?
-  isOpen      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model StudyAbroad {
-  id          String   @id @default(cuid())
-  country     String
-  university  String
-  program     String
-  tuition     Float?
-  duration    String?
-  requirements String?
-  description String?
-  isPublished Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  @@index([industry])
+  @@index([verified])
+  @@map("companies")
 }
 
 model Internship {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   companyId   String
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   title       String
+  slug        String    @unique
   location    String?
-  mode        String   @default("REMOTE")
-  stipend     Float?
+  mode        WorkMode  @default(REMOTE)
+  stipend     Decimal? 
+  currency    String    @default("INR")
   duration    String?
   description String?
   skills      String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  openings    Int       @default(1)
+  isActive    Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
-  applications Application[]
+  company      Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications InternshipApplication[]
+  offers       InternshipOffer[]
+  progress     InternshipProgress[]
+  feedback     InternshipFeedback[]
+  mentors      Mentor[]
+
+  @@index([companyId])
+  @@index([isActive])
+  @@map("internships")
 }
 
-model LiveProject {
-  id          String   @id @default(cuid())
+model InternshipApplication {
+  id           String            @id @default(cuid())
+  userId       String
+  studentId    String
+  internshipId String
+  status       ApplicationStatus @default(PENDING)
+  coverLetter  String?
+  resumeUrl    String?
+  appliedAt    DateTime          @default(now())
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  deletedAt    DateTime?
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  offers     InternshipOffer[]
+
+  @@unique([studentId, internshipId])
+  @@index([userId])
+  @@index([internshipId])
+  @@index([status])
+  @@map("internship_applications")
+}
+
+model InternshipOffer {
+  id            String                @id @default(cuid())
+  applicationId String
+  internshipId  String
+  stipend       Decimal?             
+  currency      String                @default("INR")
+  startDate     DateTime?
+  endDate       DateTime?
+  status        InternshipOfferStatus @default(PENDING)
+  offeredAt     DateTime              @default(now())
+  respondedAt   DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  application InternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  internship  Internship            @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([internshipId])
+  @@index([status])
+  @@map("internship_offers")
+}
+
+model InternshipProgress {
+  id           String    @id @default(cuid())
+  studentId    String
+  internshipId String
+  weekNumber   Int
+  summary      String?
+  tasksDone    String?
+  hoursLogged  Decimal? 
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, internshipId, weekNumber])
+  @@index([studentId])
+  @@index([internshipId])
+  @@map("internship_progress")
+}
+
+model Mentor {
+  id           String    @id @default(cuid())
+  companyId    String
+  internshipId String?
+  name         String
+  email        String?
+  phone        String?
+  designation  String?
+  bio          String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  internship Internship? @relation(fields: [internshipId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([internshipId])
+  @@map("mentors")
+}
+
+model InternshipFeedback {
+  id           String    @id @default(cuid())
+  studentId    String
+  internshipId String
+  rating       Int
+  comment      String?
+  givenBy      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([internshipId])
+  @@map("internship_feedback")
+}
+
+// ─── PROJECT ───────────────────────────────────────────────────────────────────
+
+model ProjectCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  projects Project[]
+
+  @@map("project_categories")
+}
+
+model Project {
+  id          String    @id @default(cuid())
   companyId   String
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  categoryId  String?
   title       String
+  slug        String    @unique
   domain      String?
   description String?
   duration    String?
-  stipend     Float?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  stipend     Decimal? 
+  currency    String    @default("INR")
+  teamSize    Int       @default(1)
+  isActive    Boolean   @default(true)
+  deadline    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
-  applications Application[]
+  company      Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category     ProjectCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  technologies ProjectTechnology[]
+  teamMembers  ProjectTeamMember[]
+  submissions  ProjectSubmission[]
+
+  @@index([companyId])
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("projects")
+}
+
+model ProjectTechnology {
+  id           String   @id @default(cuid())
+  projectId    String
+  technology   String
+  createdAt    DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, technology])
+  @@index([projectId])
+  @@map("project_technologies")
+}
+
+model ProjectTeamMember {
+  id        String   @id @default(cuid())
+  projectId String
+  studentId String
+  role      String   @default("MEMBER")
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, studentId])
+  @@index([projectId])
+  @@index([studentId])
+  @@map("project_team_members")
+}
+
+model ProjectSubmission {
+  id          String                  @id @default(cuid())
+  projectId   String
+  studentId   String
+  title       String
+  description String?
+  repoUrl     String?
+  demoUrl     String?
+  fileUrl     String?
+  status      ProjectSubmissionStatus @default(DRAFT)
+  submittedAt DateTime?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  deletedAt   DateTime?
+
+  project     Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  student     Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  evaluations ProjectEvaluation[]
+
+  @@index([projectId])
+  @@index([studentId])
+  @@index([status])
+  @@map("project_submissions")
+}
+
+model ProjectEvaluation {
+  id           String   @id @default(cuid())
+  submissionId String
+  evaluatorId  String?
+  score        Decimal 
+  maxScore     Int      @default(100)
+  feedback     String?
+  evaluatedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  submission ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@map("project_evaluations")
+}
+
+// ─── JOB ───────────────────────────────────────────────────────────────────────
+
+model HrUser {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  companyId   String
+  designation String?
+  department  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  jobs       Job[]
+  interviews Interview[]
+
+  @@index([companyId])
+  @@map("hr_users")
 }
 
 model Job {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   companyId   String
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  hrUserId    String?
   title       String
+  slug        String         @unique
   location    String?
-  type        String   @default("FULL_TIME")
-  salaryMin   Float?
-  salaryMax   Float?
+  type        EmploymentType @default(FULL_TIME)
+  mode        WorkMode       @default(HYBRID)
+  salaryMin   Decimal?      
+  salaryMax   Decimal?      
+  currency    String         @default("INR")
   experience  String?
   description String?
   skills      String?
-  isActive    Boolean  @default(true)
+  openings    Int            @default(1)
+  isActive    Boolean        @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  company      Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  hrUser       HrUser?          @relation(fields: [hrUserId], references: [id], onDelete: SetNull)
+  applications JobApplication[]
+  savedBy      SavedJob[]
+  interviews   Interview[]
+  offers       JobOffer[]
+
+  @@index([companyId])
+  @@index([hrUserId])
+  @@index([isActive])
+  @@map("jobs")
+}
+
+model JobApplication {
+  id          String            @id @default(cuid())
+  userId      String
+  jobId       String
+  status      ApplicationStatus @default(PENDING)
+  coverLetter String?
+  resumeUrl   String?
+  appliedAt   DateTime          @default(now())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  interviews  Interview[]
+  offers      JobOffer[]
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([jobId])
+  @@index([status])
+  @@map("job_applications")
+}
+
+model SavedJob {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([jobId])
+  @@map("saved_jobs")
+}
+
+model Interview {
+  id            String          @id @default(cuid())
+  jobId         String
+  applicationId String
+  hrUserId      String?
+  scheduledAt   DateTime
+  durationMin   Int             @default(45)
+  mode          WorkMode        @default(REMOTE)
+  meetingUrl    String?
+  status        InterviewStatus @default(SCHEDULED)
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  job         Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  hrUser      HrUser?        @relation(fields: [hrUserId], references: [id], onDelete: SetNull)
+
+  @@index([jobId])
+  @@index([applicationId])
+  @@index([scheduledAt])
+  @@map("interviews")
+}
+
+model JobOffer {
+  id            String         @id @default(cuid())
+  jobId         String
+  applicationId String
+  salary        Decimal       
+  currency      String         @default("INR")
+  joiningDate   DateTime?
+  status        JobOfferStatus @default(PENDING)
+  offeredAt     DateTime       @default(now())
+  respondedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  job         Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([applicationId])
+  @@index([status])
+  @@map("job_offers")
+}
+
+model Employee {
+  id          String    @id @default(cuid())
+  companyId   String
+  employeeNo  String
+  name        String
+  email       String?
+  phone       String?
+  designation String?
+  department  String?
+  salary      Decimal? 
+  currency    String    @default("INR")
+  joinedAt    DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payrollItems PayrollItem[]
+
+  @@unique([companyId, employeeNo])
+  @@index([companyId])
+  @@map("employees")
+}
+
+model PayrollRun {
+  id          String           @id @default(cuid())
+  companyId   String?
+  periodStart DateTime
+  periodEnd   DateTime
+  status      PayrollRunStatus @default(DRAFT)
+  totalAmount Decimal?        
+  currency    String           @default("INR")
+  processedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  items PayrollItem[]
+
+  @@index([periodStart, periodEnd])
+  @@index([status])
+  @@map("payroll_runs")
+}
+
+model PayrollItem {
+  id           String   @id @default(cuid())
+  payrollRunId String
+  employeeId   String
+  grossPay     Decimal 
+  deductions   Decimal  @default(0)
+  netPay       Decimal 
+  currency     String   @default("INR")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([payrollRunId, employeeId])
+  @@index([payrollRunId])
+  @@index([employeeId])
+  @@map("payroll_items")
+}
+
+// ─── TRAINING ──────────────────────────────────────────────────────────────────
+
+model TrainingCenter {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  name        String
+  specialty   String?
+  city        String?
+  state       String?
+  website     String?
+  description String?
+  logoUrl     String?
+  verified    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  trainers  Trainer[]
+  programs  TrainingProgram[]
+  courses   Course[]
+  revenue   TrainingRevenue[]
+
+  @@index([city, state])
+  @@map("training_centers")
+}
+
+model Trainer {
+  id               String    @id @default(cuid())
+  trainingCenterId String
+  name             String
+  email            String?
+  phone            String?
+  specialty        String?
+  bio              String?
+  avatarUrl        String?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  trainingCenter TrainingCenter   @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  batches        TrainingBatch[]
+
+  @@index([trainingCenterId])
+  @@map("trainers")
+}
+
+model TrainingProgram {
+  id               String    @id @default(cuid())
+  trainingCenterId String
+  title            String
+  slug             String    @unique
+  description      String?
+  duration         String?
+  price            Decimal   @default(0)
+  currency         String    @default("INR")
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  trainingCenter TrainingCenter   @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  batches        TrainingBatch[]
+  assignments    TrainingAssignment[]
+
+  @@index([trainingCenterId])
+  @@map("training_programs")
+}
+
+model TrainingBatch {
+  id          String    @id @default(cuid())
+  programId   String
+  trainerId   String?
+  name        String
+  startDate   DateTime
+  endDate     DateTime?
+  capacity    Int       @default(30)
+  enrolled    Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  program    TrainingProgram      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  trainer    Trainer?             @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  attendance AttendanceRecord[]
+
+  @@index([programId])
+  @@index([trainerId])
+  @@map("training_batches")
+}
+
+model AttendanceRecord {
+  id        String           @id @default(cuid())
+  batchId   String
+  studentId String
+  date      DateTime
+  status    AttendanceStatus @default(PRESENT)
+  notes     String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  batch   TrainingBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  student Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, studentId, date])
+  @@index([batchId])
+  @@index([studentId])
+  @@map("attendance_records")
+}
+
+model TrainingAssignment {
+  id          String    @id @default(cuid())
+  programId   String
+  studentId   String
+  title       String
+  description String?
+  dueDate     DateTime?
+  submittedAt DateTime?
+  score       Decimal? 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  program TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  student Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@index([studentId])
+  @@map("training_assignments")
+}
+
+model TrainingRevenue {
+  id               String   @id @default(cuid())
+  trainingCenterId String
+  periodMonth      Int
+  periodYear       Int
+  grossRevenue     Decimal 
+  netRevenue       Decimal 
+  currency         String   @default("INR")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  trainingCenter TrainingCenter @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+
+  @@unique([trainingCenterId, periodMonth, periodYear])
+  @@index([trainingCenterId])
+  @@map("training_revenue")
+}
+
+// ─── PARTNER ───────────────────────────────────────────────────────────────────
+
+model Partner {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  name          String
+  region        String?
+  referralCode  String    @unique
+  commissionPct Decimal   @default(10)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  leads     PartnerLead[]
+  referrals Referral[]
+  wallet    PartnerWallet?
+  commissions Commission[]
+  payouts   Payout[]
+  reports   PartnerReport[]
+
+  @@index([referralCode])
+  @@map("partners")
+}
+
+model PartnerLead {
+  id          String    @id @default(cuid())
+  partnerId   String
+  name        String
+  email       String?
+  phone       String?
+  source      String?
+  status      String    @default("NEW")
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([status])
+  @@map("partner_leads")
+}
+
+model Referral {
+  id           String   @id @default(cuid())
+  partnerId    String
+  referredEmail String
+  referredUserId String?
+  status       String   @default("PENDING")
+  convertedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  partner    Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  commissions Commission[]
+
+  @@index([partnerId])
+  @@index([referredEmail])
+  @@map("referrals")
+}
+
+model PartnerWallet {
+  id        String    @id @default(cuid())
+  partnerId String    @unique
+  balance   Decimal   @default(0)
+  currency  String    @default("INR")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@map("partner_wallets")
+}
+
+model Commission {
+  id         String           @id @default(cuid())
+  partnerId  String
+  referralId String?
+  amount     Decimal         
+  currency   String           @default("INR")
+  status     CommissionStatus @default(PENDING)
+  earnedAt   DateTime         @default(now())
+  paidAt     DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  partner  Partner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  referral Referral? @relation(fields: [referralId], references: [id], onDelete: SetNull)
+  payouts  Payout[]
+
+  @@index([partnerId])
+  @@index([referralId])
+  @@index([status])
+  @@map("commissions")
+}
+
+model Payout {
+  id           String       @id @default(cuid())
+  partnerId    String
+  commissionId String?
+  amount       Decimal     
+  currency     String       @default("INR")
+  status       PayoutStatus @default(PENDING)
+  reference    String?
+  processedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  partner    Partner     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  commission Commission? @relation(fields: [commissionId], references: [id], onDelete: SetNull)
+
+  @@index([partnerId])
+  @@index([commissionId])
+  @@index([status])
+  @@map("payouts")
+}
+
+model PartnerReport {
+  id          String   @id @default(cuid())
+  partnerId   String
+  reportType  String
+  periodStart DateTime
+  periodEnd   DateTime
+  data        Json
+  generatedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([reportType])
+  @@map("partner_reports")
+}
+
+// ─── ADMIN ─────────────────────────────────────────────────────────────────────
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  applications Application[]
+  @@map("settings")
 }
 
-model Application {
-  id           String            @id @default(cuid())
-  userId       String
-  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobId        String?
-  job          Job?              @relation(fields: [jobId], references: [id])
-  internshipId String?
-  internship   Internship?       @relation(fields: [internshipId], references: [id])
-  projectId    String?
-  project      LiveProject?      @relation(fields: [projectId], references: [id])
-  status       ApplicationStatus @default(PENDING)
-  coverLetter  String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-}
-
-model Certificate {
-  id         String   @id @default(cuid())
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  title      String
-  issuer     String
-  issuedAt   DateTime @default(now())
-  credential String?
-  fileUrl    String?
-}
-
-model Wallet {
+model Configuration {
   id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  balance   Float    @default(0)
+  namespace String
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  transactions WalletTransaction[]
+  @@unique([namespace, key])
+  @@index([namespace])
+  @@map("configurations")
 }
 
-model WalletTransaction {
+model Report {
   id          String   @id @default(cuid())
-  walletId    String
-  wallet      Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  amount      Float
-  type        String
-  description String?
-  createdAt   DateTime @default(now())
-}
-
-model Coupon {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  discountPct Float
-  maxUses     Int      @default(100)
-  usedCount   Int      @default(0)
-  expiresAt   DateTime?
-  isActive    Boolean  @default(true)
+  title       String
+  reportType  String
+  parameters  Json?
+  fileUrl     String?
+  generatedBy String?
+  generatedAt DateTime @default(now())
   createdAt   DateTime @default(now())
 
-  redemptions CouponRedemption[]
+  @@index([reportType])
+  @@index([generatedAt])
+  @@map("reports")
 }
 
-model CouponRedemption {
-  id        String   @id @default(cuid())
-  couponId  String
-  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+model AnalyticsSnapshot {
+  id         String   @id @default(cuid())
+  metricKey  String
+  metricValue Decimal
+  dimensions Json?
+  capturedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 
-  @@unique([couponId, userId])
+  @@index([metricKey])
+  @@index([capturedAt])
+  @@map("analytics_snapshots")
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  targetRole  Role?
+  isPublished Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@index([isPublished])
+  @@index([targetRole])
+  @@map("announcements")
+}
+
+model Banner {
+  id          String    @id @default(cuid())
+  title       String
+  imageUrl    String
+  linkUrl     String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([isActive])
+  @@map("banners")
+}
+
+model CmsPage {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  content     String
+  metaTitle   String?
+  metaDesc    String?
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@index([isPublished])
+  @@map("cms_pages")
+}
+
+model SupportTicket {
+  id           String         @id @default(cuid())
+  userId       String
+  assigneeId   String?
+  subject      String
+  description  String
+  status       TicketStatus   @default(OPEN)
+  priority     TicketPriority @default(MEDIUM)
+  category     String?
+  resolvedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+
+  user     User  @relation("TicketRequester", fields: [userId], references: [id], onDelete: Cascade)
+  assignee User? @relation("TicketAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("support_tickets")
+}
+
+// ─── PAYMENT ───────────────────────────────────────────────────────────────────
+
+model PremiumPlan {
+  id           String    @id @default(cuid())
+  name         String    @unique
+  slug         String    @unique
+  description  String?
+  price        Decimal  
+  currency     String    @default("INR")
+  billingCycle String    @default("MONTHLY")
+  features     Json?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  subscriptions Subscription[]
+
+  @@map("premium_plans")
+}
+
+model Subscription {
+  id         String             @id @default(cuid())
+  userId     String
+  planId     String
+  status     SubscriptionStatus @default(TRIAL)
+  startDate  DateTime           @default(now())
+  endDate    DateTime?
+  trialEndsAt DateTime?
+  cancelledAt DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan PremiumPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
 }
 
 model Payment {
   id        String        @id @default(cuid())
   userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Float
+  amount    Decimal      
   currency  String        @default("INR")
   status    PaymentStatus @default(PENDING)
   provider  String        @default("RAZORPAY")
-  reference String?
+  reference String?       @unique
   purpose   String?
+  metadata  Json?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
+  transactions Transaction[]
+  refunds      Refund[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payments")
 }
+
+model Invoice {
+  id            String        @id @default(cuid())
+  paymentId     String?
+  invoiceNo     String        @unique
+  userId        String?
+  amount        Decimal      
+  taxAmount     Decimal       @default(0)
+  totalAmount   Decimal      
+  currency      String        @default("INR")
+  status        InvoiceStatus @default(DRAFT)
+  issuedAt      DateTime?
+  dueDate       DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  paymentId   String
+  type        TransactionType
+  amount      Decimal        
+  currency    String          @default("INR")
+  providerRef String?
+  status      PaymentStatus   @default(PENDING)
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model Refund {
+  id          String        @id @default(cuid())
+  paymentId   String
+  amount      Decimal      
+  currency    String        @default("INR")
+  reason      String?
+  status      PaymentStatus @default(PENDING)
+  providerRef String?
+  processedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([status])
+  @@map("refunds")
+}
+
+// ─── NOTIFICATION ──────────────────────────────────────────────────────────────
 
 model Notification {
   id        String           @id @default(cuid())
   userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
   type      NotificationType @default(INFO)
+  channel   NotificationChannel @default(IN_APP)
   isRead    Boolean          @default(false)
   link      String?
+  readAt    DateTime?
   createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
 }
 
-model Setting {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
-  updatedAt DateTime @updatedAt
+model EmailLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  toEmail      String
+  subject      String
+  template     String?
+  status       String   @default("QUEUED")
+  providerRef  String?
+  errorMessage String?
+  sentAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([toEmail])
+  @@index([status])
+  @@map("email_logs")
+}
+
+model SmsLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  phone        String
+  message      String
+  status       String   @default("QUEUED")
+  providerRef  String?
+  errorMessage String?
+  sentAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([phone])
+  @@index([status])
+  @@map("sms_logs")
+}
+
+model PushNotification {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  body        String
+  deviceToken String?
+  status      String   @default("QUEUED")
+  providerRef String?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("push_notifications")
+}
+
+model WhatsappLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  phone        String
+  message      String
+  template     String?
+  status       String   @default("QUEUED")
+  providerRef  String?
+  errorMessage String?
+  sentAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([phone])
+  @@index([status])
+  @@map("whatsapp_logs")
 }

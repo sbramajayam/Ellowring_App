@@ -1,22 +1,44 @@
 "use client";
 
 import { HrShell } from "@/components/hr-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <HrShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Internship Hiring</h1>
-          <p className="mt-1 text-sm text-slate-500">Post internships and track applicant pipelines.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Post internships and track applicant pipelines."
-        />
-        <DataTable columns={["Item","Owner","Updated","Status"]} rows={[["Sample Internship Hiring","HR","Today","Open"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Internship Hiring"
+        description="Active internship openings."
+        endpoint="/internships"
+        auth={false}
+        columns={[
+  {
+    "key": "title",
+    "label": "Title",
+    "path": "title"
+  },
+  {
+    "key": "company",
+    "label": "Company",
+    "path": "company.name"
+  },
+  {
+    "key": "mode",
+    "label": "Mode",
+    "path": "mode"
+  },
+  {
+    "key": "stipend",
+    "label": "Stipend",
+    "path": "money:stipend"
+  },
+  {
+    "key": "duration",
+    "label": "Duration",
+    "path": "duration"
+  }
+]}
+      />
     </HrShell>
   );
 }

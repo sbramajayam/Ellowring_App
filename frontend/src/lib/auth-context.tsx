@@ -104,12 +104,12 @@ export function useAuth() {
 
 export function dashboardPath(role: Role) {
   const map: Record<Role, string> = {
-    STUDENT: "/dashboard/student",
-    COLLEGE: "/dashboard/college",
-    COMPANY: "/dashboard/hr",
-    TRAINING: "/dashboard/training",
-    PARTNER: "/dashboard/partner",
-    ADMIN: "/dashboard/admin",
+    STUDENT: "/dashboard/student/",
+    COLLEGE: "/dashboard/college/",
+    COMPANY: "/dashboard/hr/",
+    TRAINING: "/dashboard/training/",
+    PARTNER: "/dashboard/partner/",
+    ADMIN: "/dashboard/admin/",
   };
   return map[role];
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -8,31 +8,74 @@ export class ApplicationsController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
-  mine(@Req() req: any) {
-    return this.prisma.application.findMany({
-      where: { userId: req.user.userId },
-      include: {
-        job: { include: { company: { select: { name: true } } } },
-        internship: { include: { company: { select: { name: true } } } },
-        project: { include: { company: { select: { name: true } } } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async mine(@Req() req: any) {
+    const userId = req.user.userId as string;
+    const [jobApplications, internshipApplications] = await Promise.all([
+      this.prisma.jobApplication.findMany({
+        where: { userId },
+        include: { job: { include: { company: { select: { name: true } } } } },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.internshipApplication.findMany({
+        where: { userId },
+        include: { internship: { include: { company: { select: { name: true } } } } },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+    return { jobApplications, internshipApplications };
   }
 
   @Post()
-  create(
+  async create(
     @Req() req: any,
-    @Body() body: { jobId?: string; internshipId?: string; projectId?: string; coverLetter?: string },
+    @Body()
+    body: {
+      jobId?: string;
+      internshipId?: string;
+      projectId?: string;
+      coverLetter?: string;
+      resumeUrl?: string;
+    },
   ) {
-    return this.prisma.application.create({
-      data: {
-        userId: req.user.userId,
-        jobId: body.jobId,
-        internshipId: body.internshipId,
-        projectId: body.projectId,
-        coverLetter: body.coverLetter,
-      },
-    });
+    const userId = req.user.userId as string;
+
+    if (body.jobId) {
+      return this.prisma.jobApplication.create({
+        data: {
+          userId,
+          jobId: body.jobId,
+          coverLetter: body.coverLetter,
+          resumeUrl: body.resumeUrl,
+        },
+      });
+    }
+
+    if (body.internshipId) {
+      const student = await this.prisma.student.findUnique({ where: { userId } });
+      if (!student) throw new BadRequestException('Student profile required');
+      return this.prisma.internshipApplication.create({
+        data: {
+          userId,
+          studentId: student.id,
+          internshipId: body.internshipId,
+          coverLetter: body.coverLetter,
+          resumeUrl: body.resumeUrl,
+        },
+      });
+    }
+
+    if (body.projectId) {
+      const student = await this.prisma.student.findUnique({ where: { userId } });
+      if (!student) throw new BadRequestException('Student profile required');
+      return this.prisma.projectTeamMember.create({
+        data: {
+          projectId: body.projectId,
+          studentId: student.id,
+          role: 'APPLICANT',
+        },
+      });
+    }
+
+    throw new BadRequestException('jobId, internshipId, or projectId is required');
   }
 }

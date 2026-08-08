@@ -25,7 +25,10 @@ export class EnterpriseController {
   async studentProfile(@Param('id') id: string) {
     const student = await this.prisma.student.findFirst({
       where: { OR: [{ id }, { userId: id }] },
-      include: { user: { select: { name: true } } },
+      include: {
+        user: { select: { name: true } },
+        careerInterests: { take: 5, orderBy: { priority: 'asc' } },
+      },
     });
     if (!student) {
       return { found: false, consentRequired: true };
@@ -38,7 +41,8 @@ export class EnterpriseController {
         name: student.user.name,
         city: student.city,
         stream: student.stream,
-        careerInterest: student.careerInterest,
+        careerInterest: student.careerInterests[0]?.title ?? null,
+        careerInterests: student.careerInterests.map((c) => c.title),
       },
     };
   }
@@ -47,7 +51,7 @@ export class EnterpriseController {
   async verifyCertificate(@Param('code') code: string) {
     const cert = await this.prisma.certificate.findFirst({
       where: {
-        OR: [{ id: code }, { credential: code }],
+        OR: [{ id: code }, { credentialId: code }],
       },
       include: { student: { include: { user: { select: { name: true } } } } },
     });
@@ -63,7 +67,7 @@ export class EnterpriseController {
 
     return {
       valid: true,
-      code: cert.credential || cert.id,
+      code: cert.credentialId || cert.id,
       holderName: cert.student.user.name,
       issuedAt: cert.issuedAt,
       issuer: cert.issuer || 'Ellowring Software Solutions',

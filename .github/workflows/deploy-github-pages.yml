@@ -34,8 +34,14 @@ jobs:
         working-directory: frontend
         env:
           GITHUB_PAGES: "true"
-          NEXT_PUBLIC_API_URL: https://quarterly-saturday-limousines-entitled.trycloudflare.com/api
+          NEXT_PUBLIC_API_URL: https://bay-lives-mailed-first.trycloudflare.com/api
+          NEXT_PUBLIC_BASE_PATH: /Ellowring_App
+          NEXT_PUBLIC_OLD_WEBSITE_URL: https://sbramajayam.github.io/E-website-app
         run: npm run build
+
+      - name: Ensure Pages serves _next
+        working-directory: frontend
+        run: touch out/.nojekyll
 
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -44,3 +50,4 @@ jobs:
           publish_dir: frontend/out
           publish_branch: gh-pages
           force_orphan: true
+          enable_jekyll: false

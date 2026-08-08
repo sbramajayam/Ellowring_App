@@ -1,22 +1,39 @@
 "use client";
 
 import { HrShell } from "@/components/hr-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <HrShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Candidate Search</h1>
-          <p className="mt-1 text-sm text-slate-500">Consent-gated search across Ellowring talent.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Consent-gated search across Ellowring talent."
-        />
-        <DataTable columns={["Item","Owner","Updated","Status"]} rows={[["Sample Candidate Search","HR","Today","Open"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Candidate Search"
+        description="Applications submitted on Ellowring."
+        endpoint="/applications"
+        auth={true}
+        columns={[
+  {
+    "key": "id",
+    "label": "Application",
+    "path": "id"
+  },
+  {
+    "key": "status",
+    "label": "Status",
+    "path": "status"
+  },
+  {
+    "key": "job",
+    "label": "Job",
+    "path": "job.title"
+  },
+  {
+    "key": "createdAt",
+    "label": "Applied",
+    "path": "createdAt"
+  }
+]}
+      />
     </HrShell>
   );
 }

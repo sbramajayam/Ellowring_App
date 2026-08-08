@@ -7,6 +7,7 @@ import clsx from "clsx";
  * SVG mark reserved for dark/compact headers where the JPG white plate would clash.
  */
 
+
 /** Compact 5-segment ring for dark/small headers. */
 export function EllowringMark({ className = "h-10 w-10" }: { className?: string }) {
   const colors = [
@@ -90,7 +91,7 @@ export function EllowringLogo({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/brand/ellowring-logo.jpg"
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/brand/ellowring-logo.jpg`}
           alt="Ellowring Software Solutions"
           className="w-auto object-contain"
           style={{ height: h, maxWidth: variant === "horizontal" ? 260 : 200 }}

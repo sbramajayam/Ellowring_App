@@ -6,14 +6,15 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 type Wallet = {
-  balance: number;
-  transactions: { id: string; amount: number; type: string; description?: string; createdAt: string }[];
+  balance: number | string;
+  ledger?: { id: string; amount: number | string; type: string; description?: string; createdAt: string }[];
+  transactions?: { id: string; amount: number | string; type: string; description?: string; createdAt: string }[];
 };
 
 export default function StudentWalletPage() {
   const { token } = useAuth();
   const [wallet, setWallet] = useState<Wallet | null>(null);
-  const [code, setCode] = useState("ELLO500");
+  const [code, setCode] = useState("WELCOME100");
   const [msg, setMsg] = useState("");
 
   const load = () => {
@@ -31,9 +32,12 @@ export default function StudentWalletPage() {
       token,
       body: JSON.stringify({ code }),
     });
-    setMsg(res.error || `${res.message} (+${res.credit})`);
+    setMsg(res.error || `${res.message || "Done"} (+${res.credit ?? 0})`);
     load();
   }
+
+  const rows = wallet?.ledger || wallet?.transactions || [];
+  const balance = Number(wallet?.balance ?? 0);
 
   return (
     <StudentShell>
@@ -43,7 +47,7 @@ export default function StudentWalletPage() {
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-sm text-slate-500">Available balance</p>
-        <p className="mt-2 text-4xl font-bold text-slate-900">₹{wallet?.balance ?? 0}</p>
+        <p className="mt-2 text-4xl font-bold text-slate-900">₹{balance.toLocaleString("en-IN")}</p>
         <button className="mt-4 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
           Add Money
         </button>
@@ -62,7 +66,7 @@ export default function StudentWalletPage() {
       {msg && <p className="mt-3 text-sm font-medium text-emerald-600">{msg}</p>}
 
       <div className="mt-6 space-y-2">
-        {(wallet?.transactions || []).map((t) => (
+        {rows.map((t) => (
           <div
             key={t.id}
             className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
@@ -71,7 +75,7 @@ export default function StudentWalletPage() {
               <p className="text-sm font-medium">{t.description || t.type}</p>
               <p className="text-xs text-slate-400">{new Date(t.createdAt).toLocaleString()}</p>
             </div>
-            <p className="font-semibold text-emerald-600">+₹{t.amount}</p>
+            <p className="font-semibold text-emerald-600">₹{Number(t.amount).toLocaleString("en-IN")}</p>
           </div>
         ))}
       </div>

@@ -1,22 +1,34 @@
 "use client";
 
 import { AdminShell } from "@/components/admin-shell";
-import { ModuleCard, DataTable } from "@/components/role-shell";
+import { RoleApiTablePage } from "@/components/role-api-table";
 
 export default function Page() {
   return (
     <AdminShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-          <p className="mt-1 text-sm text-slate-500">Platform configuration, feature flags and policies.</p>
-        </div>
-        <ModuleCard
-          title="Phase 2 module workspace"
-          description="Platform configuration, feature flags and policies."
-        />
-        <DataTable columns={["Item","Owner","Priority","Status"]} rows={[["Sample Settings","Admin","Normal","Open"]]} />
-      </div>
+      <RoleApiTablePage
+        title="Settings"
+        description="System settings key-value store."
+        endpoint="/admin/settings"
+        auth={true}
+        columns={[
+  {
+    "key": "key",
+    "label": "Key",
+    "path": "key"
+  },
+  {
+    "key": "value",
+    "label": "Value",
+    "path": "value"
+  },
+  {
+    "key": "description",
+    "label": "Description",
+    "path": "description"
+  }
+]}
+      />
     </AdminShell>
   );
 }

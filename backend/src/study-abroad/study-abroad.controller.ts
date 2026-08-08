@@ -7,8 +7,27 @@ export class StudyAbroadController {
 
   @Get()
   list(@Query('country') country?: string) {
-    return this.prisma.studyAbroad.findMany({
-      where: { isPublished: true, ...(country ? { country } : {}) },
+    return this.prisma.abroadProgram.findMany({
+      where: {
+        isActive: true,
+        ...(country
+          ? {
+              university: {
+                country: {
+                  OR: [
+                    { name: { contains: country } },
+                    { code: { equals: country.toUpperCase() } },
+                  ],
+                },
+              },
+            }
+          : {}),
+      },
+      include: {
+        university: {
+          include: { country: { select: { name: true, code: true } } },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
