@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { dashboardPath, useAuth } from "@/lib/auth-context";
 import { AuthSplitShell, authUnderlineInput } from "@/components/auth-split-shell";
+import { checkApiHealth } from "@/lib/api";
 
 const demoAccounts = [
   "student@ellowring.com",
@@ -26,6 +27,11 @@ export function AppLoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<{
+    ok: boolean;
+    base: string;
+    detail: string;
+  } | null>(null);
 
   function resolveNext(role: Parameters<typeof dashboardPath>[0]) {
     const raw = searchParams.get("next");
@@ -39,11 +45,26 @@ export function AppLoginScreen() {
     }
   }, [authLoading, user, router, searchParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+    checkApiHealth().then((status) => {
+      if (!cancelled) setApiStatus(status);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      const health = await checkApiHealth();
+      setApiStatus(health);
+      if (!health.ok) {
+        throw new Error(health.detail);
+      }
       const nextUser = await login(email, password);
       router.push(resolveNext(nextUser.role));
     } catch (err: unknown) {
@@ -70,7 +91,21 @@ export function AppLoginScreen() {
         Welcome back. Enter your Ellowring workspace credentials to continue.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-10 space-y-8">
+      {apiStatus ? (
+        <p
+          className={`mt-4 rounded-lg px-3 py-2 text-[12px] ring-1 ${
+            apiStatus.ok
+              ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+              : "bg-amber-50 text-amber-800 ring-amber-100"
+          }`}
+        >
+          {apiStatus.ok ? "API connected" : "API offline"} — {apiStatus.detail}
+        </p>
+      ) : (
+        <p className="mt-4 text-[12px] text-slate-400">Checking API connection…</p>
+      )}
+
+      <form onSubmit={onSubmit} className="mt-8 space-y-8">
         <label className="block">
           <span className="text-[13px] font-bold text-[#1E293B]">Email</span>
           <input
@@ -127,41 +162,20 @@ export function AppLoginScreen() {
           </div>
           <button
             type="submit"
-            disabled={loading}
-            className="rounded-xl bg-[#2563EB] px-8 py-3 text-[14px] font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 disabled:opacity-60"
+            disabled={loading || apiStatus?.ok === false}
+            className="inline-flex h-11 min-w-[120px] items-center justify-center rounded-full bg-[#2563EB] px-8 text-[14px] font-bold text-white shadow-sm transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>
         </div>
       </form>
 
-      <p className="mt-8 text-[13px] text-slate-400">
-        No account?{" "}
-        <Link href="/register" className="font-semibold text-[#2563EB] hover:underline">
-          Create account
-        </Link>
+      <p className="mt-8 text-[12px] leading-relaxed text-slate-400">
+        Demo password for all roles:{" "}
+        <span className="font-semibold text-slate-600">password123</span>
+        <br />
+        Accounts: {demoAccounts.join(" · ")}
       </p>
-
-      <div className="mt-6 border-t border-slate-100 pt-5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-          Demo · password123
-        </p>
-        <div className="mt-2.5 flex flex-wrap gap-1.5">
-          {demoAccounts.map((addr) => (
-            <button
-              key={addr}
-              type="button"
-              onClick={() => {
-                setEmail(addr);
-                setPassword("password123");
-              }}
-              className="rounded-md bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500 transition hover:bg-blue-50 hover:text-blue-700"
-            >
-              {addr.split("@")[0]}
-            </button>
-          ))}
-        </div>
-      </div>
     </AuthSplitShell>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
@@ -27,9 +28,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
+        <Script src={`${base}/runtime-config.js`} strategy="beforeInteractive" />
         <I18nProvider>
           <AuthProvider>{children}</AuthProvider>
         </I18nProvider>
