@@ -31,14 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jakarta.variable} h-full`} suppressHydrationWarning>
       <head>
-        {/* Inline boot config — avoids next/script client-render script tag errors. */}
+        {/* Runtime config last — must win over build embed; ?v busts CDN/browser cache */}
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__ELLOWRING_API_URL__=${JSON.stringify(apiUrl)};`,
           }}
         />
-        {/* Optional override file for deploy-time edits without rebuild. */}
-        <script src={`${base}/runtime-config.js`} />
+        <script src={`${base}/runtime-config.js?v=20260810-tunnel2`} />
       </head>
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         <I18nProvider>

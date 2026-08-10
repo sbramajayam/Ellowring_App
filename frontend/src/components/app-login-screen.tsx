@@ -47,11 +47,17 @@ export function AppLoginScreen() {
 
   useEffect(() => {
     let cancelled = false;
-    checkApiHealth().then((status) => {
-      if (!cancelled) setApiStatus(status);
-    });
+    const run = () => {
+      checkApiHealth().then((status) => {
+        if (!cancelled) setApiStatus(status);
+      });
+    };
+    run();
+    // Retry once after scripts/cache catch up (stale Pages CDNs)
+    const t = window.setTimeout(run, 1200);
     return () => {
       cancelled = true;
+      window.clearTimeout(t);
     };
   }, []);
 

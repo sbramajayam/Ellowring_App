@@ -1,15 +1,29 @@
 const FALLBACK_API = "http://localhost:4001/api/v1";
 
+/** Dead quick-tunnel hosts that still appear in stale GitHub Pages caches */
+const DEAD_API_HOSTS = ["wheels-fossil-surge-elimination.trycloudflare.com"];
+
+/** Current public demo API (Cloudflare quick tunnel → local Nest on :4001) */
+const LIVE_PAGES_API = "https://metallica-for-dual-bubble.trycloudflare.com/api/v1";
+
+function sanitizeApiBase(raw: string): string {
+  const base = raw.replace(/\/$/, "");
+  if (DEAD_API_HOSTS.some((h) => base.includes(h))) {
+    return LIVE_PAGES_API;
+  }
+  return base;
+}
+
 /** Runtime override (public/runtime-config.js) wins over build-time env. */
 export function getApiBase(): string {
   if (typeof window !== "undefined") {
     const runtime = (window as Window & { __ELLOWRING_API_URL__?: string })
       .__ELLOWRING_API_URL__;
     if (runtime && typeof runtime === "string" && runtime.trim()) {
-      return runtime.replace(/\/$/, "");
+      return sanitizeApiBase(runtime.trim());
     }
   }
-  return (process.env.NEXT_PUBLIC_API_URL || FALLBACK_API).replace(/\/$/, "");
+  return sanitizeApiBase(process.env.NEXT_PUBLIC_API_URL || FALLBACK_API);
 }
 
 type ApiEnvelope<T> = {
