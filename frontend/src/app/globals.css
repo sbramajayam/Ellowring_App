@@ -66,11 +66,11 @@
   --color-info-icon: var(--color-sky-500);
   --color-premium: var(--color-purple-500);
 
-  /* Typography — layout.tsx sets --font-jakarta / --font-inter;
-     --font-plus-jakarta is the Chapter 19 canonical alias */
+  /* Typography — single Plus Jakarta family (collage screenshots = one sans-serif) */
   --font-plus-jakarta: var(--font-jakarta);
   --font-display: var(--font-plus-jakarta), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-body: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-inter: var(--font-plus-jakarta); /* alias: do not load a second face */
 
   /* Radius */
   --radius-xs: 4px;

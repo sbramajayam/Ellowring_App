@@ -1,0 +1,43 @@
+---
+description: Ellowring student collage UI — match WhatsApp screenshot designs; do not regress to tables/generic CRUD.
+globs: frontend/src/app/dashboard/student/**/*,frontend/src/components/student-home/**/*,frontend/src/components/student-shell.tsx
+alwaysApply: false
+---
+
+# Ellowring student collage UI (do not re-ask)
+
+When editing student dashboard UI, **match the Ellowring Software Solutions collage screenshots**, not admin tables or plain CRUD.
+
+## Always
+
+- Use `@/components/student-home/collage-ui` (`CollagePage`, `BlueHero`, `WhiteCard`, `ScoreRing`, `ProgressBar`, `PillButton`, `FilterChips`, `AiAssistantChip`).
+- Colors: primary `#0F3DDE`, navy `#0B1F3A`, canvas `#FAFBFC`, white cards `rounded-[20-24px]`, soft shadows.
+- **One font family only:** Plus Jakarta Sans for headings and body (`font-display` / body use the same face). Hierarchy = size + weight (400/500/600/700/800), never mix Inter/serif/other faces on student screens.
+- Mobile-first card sections; `lg:` two-column grids where the mock shows them.
+- Bottom nav (all tracks): **Home · Learn · Explore · Opportunities · Profile** via `StudentBottomNav`.
+- Prefer dense screenshot layouts with mock+live hybrid data over empty / RoleApiTablePage.
+
+## Screen → route map
+
+| Screenshot | Route |
+|---|---|
+| College Home (Quick Access, metrics) | `college-home.tsx` + `/dashboard/student` |
+| Competitive / TNPSC home | `competitive-home.tsx` |
+| AI Skill Roadmap | `/dashboard/student/learn` |
+| Project Marketplace | `/dashboard/student/projects` + Explore hub |
+| Explore Colleges & Scholarships | `/dashboard/student/colleges` + Explore hub |
+| Notifications & Opportunity Feed | `/dashboard/student/notifications` |
+| AI Career Copilot | `/dashboard/student/career` |
+| Jobs & Hiring Dashboard | `/dashboard/student/jobs` + `/opportunities` |
+| Ellowring Internship Hub | `/dashboard/student/internships` |
+| AI Resume Builder | `/dashboard/student/resume` |
+| AI Interview Coach | `/dashboard/student/ai-assistant` |
+| Digital Certificate Wallet | `/dashboard/student/certificates` |
+
+## Never
+
+- Do not replace these pages with `RoleApiTablePage` or bare admin-style tables.
+- Do not invent a purple/cream theme; keep Ellowring blue collage language.
+- Do not drop bottom nav from `StudentShell`.
+
+If the user attaches the same collage images again, **treat it as a fidelity audit** — tighten layout to match; do not say the work is already done without comparing sections.

@@ -37,6 +37,7 @@ import {
 import clsx from "clsx";
 import { useAuth } from "@/lib/auth-context";
 import { EllowringLogo } from "@/components/ellowring-logo";
+import { StudentBottomNav } from "@/components/student-home/bottom-nav";
 import { NotificationCenter, ProfileDropdown } from "@/components/ui/chrome-menus";
 import { DashboardLoading } from "@/components/ui/dashboard-loading";
 
@@ -50,7 +51,12 @@ type NavItem = {
 const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "Overview",
-    items: [{ href: "/dashboard/student", label: "Dashboard", icon: LayoutDashboard, exact: true }],
+    items: [
+      { href: "/dashboard/student", label: "Dashboard", icon: LayoutDashboard, exact: true },
+      { href: "/dashboard/student/learn", label: "Learn", icon: BookOpen },
+      { href: "/dashboard/student/explore", label: "Explore", icon: Compass },
+      { href: "/dashboard/student/opportunities", label: "Opportunities", icon: Rocket },
+    ],
   },
   {
     title: "Academics",
@@ -412,9 +418,10 @@ function StudentShellInner({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          <main className="page-enter min-h-0 w-full max-w-none flex-1 overflow-y-auto bg-[#FAFBFC]">
+          <main className="page-enter min-h-0 w-full max-w-none flex-1 overflow-y-auto bg-[#FAFBFC] pb-20 lg:pb-0">
             {children}
           </main>
+          <StudentBottomNav />
         </div>
       </div>
     </div>

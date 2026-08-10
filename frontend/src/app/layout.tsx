@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { I18nProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/lib/theme-context";
 
+/** Single collage font family (screenshots use one sans-serif; hierarchy = weight/size only) */
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +29,7 @@ export default function RootLayout({
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || API_DEFAULT;
 
   return (
-    <html lang="en" className={`${jakarta.variable} ${inter.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${jakarta.variable} h-full`} suppressHydrationWarning>
       <head>
         {/* Inline boot config — avoids next/script client-render script tag errors. */}
         <script

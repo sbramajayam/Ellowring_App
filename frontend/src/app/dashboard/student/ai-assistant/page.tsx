@@ -1,253 +1,433 @@
 ﻿"use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Bot, Loader2, MessageSquare, Plus, Send, Sparkles } from "lucide-react";
+import { useState } from "react";
+import {
+  BookOpen,
+  Bot,
+  Briefcase,
+  Calendar,
+  Download,
+  MessageSquare,
+  Mic,
+  Share2,
+  Sparkles,
+  Target,
+  Trophy,
+  Users,
+  Video,
+} from "lucide-react";
+import clsx from "clsx";
 import { StudentShell } from "@/components/student-shell";
-import { PrimaryButton, StudentModuleChrome } from "@/components/student-home/module-chrome";
-import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth-context";
+import {
+  AiAssistantChip,
+  BlueHero,
+  CollagePage,
+  CollageTitle,
+  PillButton,
+  ProgressBar,
+  ScoreRing,
+  SoftIcon,
+  WhiteCard,
+} from "@/components/student-home/collage-ui";
 
-const CHATS_KEY = "ellowring_ai_chats";
+const SKILLS = [
+  { label: "Communication", value: 88, color: "bg-emerald-500" },
+  { label: "Technical Depth", value: 76, color: "bg-[#0F3DDE]" },
+  { label: "Problem Solving", value: 82, color: "bg-sky-500" },
+  { label: "Confidence", value: 71, color: "bg-amber-400" },
+  { label: "STAR Answers", value: 79, color: "bg-violet-500" },
+];
 
-type Msg = { role: "user" | "assistant"; text: string };
+const CATEGORIES = [
+  { label: "HR Round", icon: Users, tone: "bg-blue-50 text-[#0F3DDE]" },
+  { label: "Technical", icon: Briefcase, tone: "bg-emerald-50 text-emerald-600" },
+  { label: "Behavioral", icon: MessageSquare, tone: "bg-amber-50 text-amber-600" },
+  { label: "System Design", icon: Target, tone: "bg-violet-50 text-violet-600" },
+  { label: "Aptitude", icon: BookOpen, tone: "bg-sky-50 text-sky-600" },
+  { label: "Mock Panel", icon: Video, tone: "bg-rose-50 text-rose-600" },
+];
 
-type Chat = {
-  id: string;
-  title: string;
-  messages: Msg[];
-  updatedAt: string;
+const PRACTICE_Qs = [
+  { q: "Tell me about yourself in 60 seconds.", tag: "HR", score: 72 },
+  { q: "Explain a project you are proud of.", tag: "Technical", score: 80 },
+  { q: "Describe a conflict and how you resolved it.", tag: "Behavioral", score: 68 },
+  { q: "How would you design a URL shortener?", tag: "System Design", score: 61 },
+];
+
+const HISTORY = [
+  { role: "SWE Intern", when: "2 days ago", score: 84 },
+  { role: "Full Stack", when: "1 week ago", score: 79 },
+  { role: "HR Screen", when: "2 weeks ago", score: 88 },
+];
+
+const PLAN = [
+  { day: "Day 1", focus: "HR + intro stories", mins: 25 },
+  { day: "Day 2", focus: "DSA warm-up + React", mins: 40 },
+  { day: "Day 3", focus: "Behavioral STAR drills", mins: 30 },
+  { day: "Day 4", focus: "System design lite", mins: 35 },
+  { day: "Day 5", focus: "Full mock interview", mins: 45 },
+];
+
+/** Multi-series line chart via CSS / SVG */
+const SERIES = {
+  overall: [58, 62, 70, 68, 74, 79, 84],
+  technical: [52, 55, 60, 64, 70, 73, 76],
+  soft: [64, 66, 72, 70, 75, 80, 88],
 };
 
-function loadChats(): Chat[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(CHATS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+function MultiLineChart() {
+  const w = 320;
+  const h = 120;
+  const pad = 8;
+  function path(values: number[]) {
+    return values
+      .map((v, i) => {
+        const x = pad + (i / (values.length - 1)) * (w - pad * 2);
+        const y = h - pad - (v / 100) * (h - pad * 2);
+        return `${i === 0 ? "M" : "L"}${x},${y}`;
+      })
+      .join(" ");
   }
+  return (
+    <div className="w-full overflow-x-auto">
+      <svg viewBox={`0 0 ${w} ${h}`} className="h-36 w-full min-w-[280px]">
+        {[25, 50, 75].map((g) => (
+          <line
+            key={g}
+            x1={pad}
+            x2={w - pad}
+            y1={h - pad - (g / 100) * (h - pad * 2)}
+            y2={h - pad - (g / 100) * (h - pad * 2)}
+            stroke="#E2E8F0"
+            strokeWidth="1"
+          />
+        ))}
+        <path d={path(SERIES.overall)} fill="none" stroke="#0F3DDE" strokeWidth="2.5" strokeLinecap="round" />
+        <path d={path(SERIES.technical)} fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+        <path d={path(SERIES.soft)} fill="none" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <div className="mt-2 flex flex-wrap gap-3 text-[11px] font-bold text-slate-500">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-[#0F3DDE]" /> Overall
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" /> Technical
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-sky-400" /> Soft skills
+        </span>
+      </div>
+    </div>
+  );
 }
-
-function saveChats(list: Chat[]) {
-  localStorage.setItem(CHATS_KEY, JSON.stringify(list));
-}
-
-function newChatId(): string {
-  return `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-const GREETING: Msg = {
-  role: "assistant",
-  text: "Hi! I'm your Ellowring AI Mentor. Ask me anything about careers, exams, colleges, courses, or internships — I'll guide you from Class 11 to your first job.",
-};
 
 export default function AiAssistantPage() {
-  const { token, user } = useAuth();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [input, setInput] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  const activeChat = chats.find((c) => c.id === activeId);
-  const messages = activeChat?.messages ?? [GREETING];
-
-  useEffect(() => {
-    const list = loadChats();
-    setChats(list);
-    if (list.length > 0) setActiveId(list[0].id);
-    setHydrated(true);
-  }, []);
-
-  const persist = useCallback((list: Chat[]) => {
-    setChats(list);
-    saveChats(list);
-  }, []);
-
-  function startNewChat() {
-    const chat: Chat = {
-      id: newChatId(),
-      title: "New chat",
-      messages: [GREETING],
-      updatedAt: new Date().toISOString(),
-    };
-    const list = [chat, ...chats];
-    persist(list);
-    setActiveId(chat.id);
-    setInput("");
-  }
-
-  function selectChat(id: string) {
-    setActiveId(id);
-    setInput("");
-  }
-
-  async function send(text: string) {
-    const q = text.trim();
-    if (!q || busy) return;
-    setInput("");
-    setBusy(true);
-
-    let chatId = activeId;
-    let list = [...chats];
-    let chat = list.find((c) => c.id === chatId);
-
-    if (!chat) {
-      chat = {
-        id: newChatId(),
-        title: q.slice(0, 40) + (q.length > 40 ? "…" : ""),
-        messages: [GREETING],
-        updatedAt: new Date().toISOString(),
-      };
-      chatId = chat.id;
-      list = [chat, ...list];
-      setActiveId(chatId);
-    }
-
-    const userMsg: Msg = { role: "user", text: q };
-    const withUser = [...chat.messages, userMsg];
-    list = list.map((c) =>
-      c.id === chatId
-        ? {
-            ...c,
-            title: c.messages.length <= 1 ? q.slice(0, 40) + (q.length > 40 ? "…" : "") : c.title,
-            messages: withUser,
-            updatedAt: new Date().toISOString(),
-          }
-        : c,
-    );
-    persist(list);
-
-    try {
-      const res = await api<{ recommendations?: string[]; message?: string }>(
-        `/career/assistant/suggest?interest=${encodeURIComponent(q)}`,
-        { token: token || undefined },
-      ).catch(() => null);
-      const recs = res?.recommendations?.length
-        ? `\n\nSuggested paths: ${res.recommendations.join(", ")}.`
-        : "";
-      const firstName = user?.name?.replace(/^Mr\.?\s+/i, "").trim().split(/\s+/)[0] || "there";
-      const reply =
-        (res?.message ||
-          `Hi ${firstName}! Based on your question (“${q}”), map your interests to a stream, shortlist coaching and courses on Ellowring, then build projects and apply for internships.`) +
-        recs;
-      const assistantMsg: Msg = { role: "assistant", text: reply };
-      list = list.map((c) =>
-        c.id === chatId
-          ? { ...c, messages: [...withUser, assistantMsg], updatedAt: new Date().toISOString() }
-          : c,
-      );
-      persist(list);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (!hydrated) {
-    return (
-      <StudentShell>
-        <p className="p-6 text-sm text-slate-500">
-          <Loader2 className="mr-2 inline animate-spin" size={16} /> Loading…
-        </p>
-      </StudentShell>
-    );
-  }
+  const [role, setRole] = useState("Software Engineer Intern");
+  const [difficulty, setDifficulty] = useState("Intermediate");
+  const [mode, setMode] = useState("Voice + Text");
+  const [duration, setDuration] = useState("20 min");
+  const [started, setStarted] = useState(false);
+  const [liveOn, setLiveOn] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
 
   return (
     <StudentShell>
-      <StudentModuleChrome
-        title="AI Mentor"
-        description="Personalized career guidance powered by Ellowring AI."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard/student" }, { label: "Productivity" }]}
-        actions={
-          <PrimaryButton onClick={startNewChat}>
-            <Plus size={16} /> New Chat
-          </PrimaryButton>
-        }
-      >
-        <div className="grid min-h-[560px] gap-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 lg:grid-cols-[260px_1fr]">
-          {/* Left: Recent Chats */}
-          <aside className="border-b border-slate-100 bg-[#F8FAFC] p-4 lg:border-b-0 lg:border-r">
-            <p className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-              <MessageSquare size={12} /> Recent Chats
-            </p>
-            {chats.length === 0 ? (
-              <p className="text-xs text-slate-400">No chats yet. Start a conversation below.</p>
-            ) : (
-              <ul className="space-y-1">
-                {chats.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      type="button"
-                      onClick={() => selectChat(c.id)}
-                      className={`flex w-full items-start gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition ${
-                        activeId === c.id
-                          ? "bg-[#0F3DDE] font-bold text-white shadow-sm"
-                          : "font-medium text-slate-600 hover:bg-white"
-                      }`}
-                    >
-                      <Bot size={15} className="mt-0.5 shrink-0" />
-                      <span className="line-clamp-2">{c.title}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </aside>
+      <CollagePage>
+        <CollageTitle
+          title="AI Interview Coach"
+          subtitle="Practice mock interviews, track scores, and improve with AI feedback."
+          icon={Bot}
+          action={<AiAssistantChip href="/dashboard/student/ai-assistant" />}
+        />
 
-          {/* Right: Active chat */}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-[#EEF2FF] to-white px-5 py-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0F3DDE] text-white shadow-md">
-                <Sparkles size={20} />
-              </div>
-              <div>
-                <p className="font-bold text-slate-800">Ellowring AI Mentor</p>
-                <p className="text-[11px] text-slate-500">Online · Education & career specialist</p>
-              </div>
-            </div>
-
-            <div className="flex flex-1 flex-col gap-3 overflow-y-auto bg-[#FAFBFC] p-5" style={{ minHeight: 360 }}>
-              {messages.map((msg, i) => (
-                <div key={`${msg.role}-${i}`} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                      msg.role === "user"
-                        ? "rounded-br-md bg-[#0F3DDE] text-white"
-                        : "rounded-bl-md bg-white text-slate-700 shadow-sm ring-1 ring-slate-100"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
+        <WhiteCard
+          title="Interview History"
+          action={<span className="text-[11px] font-bold text-slate-400">{HISTORY.length} sessions</span>}
+        >
+          <ul className="space-y-2">
+            {HISTORY.map((h) => (
+              <li
+                key={h.role + h.when}
+                className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-100"
+              >
+                <div>
+                  <p className="text-[13px] font-extrabold text-[#0B1F3A]">{h.role}</p>
+                  <p className="text-[11px] text-slate-500">{h.when}</p>
                 </div>
-              ))}
-              {busy && <p className="text-xs font-medium text-slate-400">AI is thinking…</p>}
-            </div>
+                <span className="rounded-full bg-[#EFF6FF] px-2.5 py-1 text-[12px] font-extrabold text-[#0F3DDE]">
+                  {h.score}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </WhiteCard>
 
-            <div className="border-t border-slate-100 bg-white p-4">
-              <form
-                className="flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void send(input);
+        <BlueHero>
+          <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
+                <Bot size={28} />
+              </div>
+              <h2 className="font-display text-2xl font-extrabold tracking-tight lg:text-[28px]">Start AI Interview</h2>
+              <p className="mt-1 text-[13px] text-blue-100">Your AI coach is ready — configure and begin.</p>
+              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 block text-[10px] font-bold uppercase text-blue-100">Target Role</span>
+                  <input
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full rounded-xl border-0 bg-white/15 px-3 py-2.5 text-[13px] font-semibold text-white outline-none ring-1 ring-white/20 placeholder:text-blue-100"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[10px] font-bold uppercase text-blue-100">Difficulty</span>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                    className="w-full rounded-xl border-0 bg-white/15 px-3 py-2.5 text-[13px] font-semibold text-white outline-none ring-1 ring-white/20"
+                  >
+                    {["Beginner", "Intermediate", "Advanced"].map((d) => (
+                      <option key={d} value={d} className="text-slate-800">
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[10px] font-bold uppercase text-blue-100">Mode</span>
+                  <select
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value)}
+                    className="w-full rounded-xl border-0 bg-white/15 px-3 py-2.5 text-[13px] font-semibold text-white outline-none ring-1 ring-white/20"
+                  >
+                    {["Voice + Text", "Text only", "Video mock"].map((d) => (
+                      <option key={d} value={d} className="text-slate-800">
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[10px] font-bold uppercase text-blue-100">Duration</span>
+                  <select
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full rounded-xl border-0 bg-white/15 px-3 py-2.5 text-[13px] font-semibold text-white outline-none ring-1 ring-white/20"
+                  >
+                    {["10 min", "20 min", "30 min", "45 min"].map((d) => (
+                      <option key={d} value={d} className="text-slate-800">
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <PillButton
+                tone="white"
+                className="mt-4"
+                onClick={() => {
+                  setStarted(true);
+                  setLiveOn(true);
+                  window.alert(`Starting ${difficulty} interview for ${role} (${mode}, ${duration}).`);
                 }}
               >
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask me anything…"
-                  className="flex-1 rounded-xl border border-slate-200 bg-[#F8FAFC] px-4 py-3 text-sm outline-none focus:border-[#0F3DDE] focus:bg-white focus:ring-4 focus:ring-blue-100"
-                />
-                <PrimaryButton type="submit" disabled={busy || !input.trim()}>
-                  <Send size={16} /> Send
-                </PrimaryButton>
-              </form>
+                <Mic size={14} /> {started ? "Resume Session" : "Start AI Interview"}
+              </PillButton>
+            </div>
+            <div className="flex flex-col items-center justify-center rounded-[20px] bg-white/10 p-5 ring-1 ring-white/15">
+              <Bot size={64} className="text-white/90" />
+              <p className="mt-3 text-center text-[12px] font-semibold text-blue-50">AI Coach Online</p>
             </div>
           </div>
+        </BlueHero>
+
+        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <WhiteCard title="Interview Readiness" className="text-[#0B1F3A]">
+            <div className="flex flex-col items-center">
+              <ScoreRing value={84} label="Ready" size={110} tone="mixed" />
+              <p className="mt-2 text-[12px] font-semibold text-slate-500">84/100 overall readiness</p>
+            </div>
+          </WhiteCard>
+          <WhiteCard title="Skill Breakdown">
+            <ul className="space-y-3">
+              {SKILLS.map((s) => (
+                <li key={s.label}>
+                  <div className="mb-1 flex justify-between text-[12px]">
+                    <span className="font-bold text-slate-700">{s.label}</span>
+                    <span className="font-extrabold text-[#0B1F3A]">{s.value}%</span>
+                  </div>
+                  <ProgressBar value={s.value} color={s.color} />
+                </li>
+              ))}
+            </ul>
+          </WhiteCard>
         </div>
-      </StudentModuleChrome>
+
+        <WhiteCard title="Feedback">
+          <div className="rounded-2xl bg-gradient-to-br from-[#EFF6FF] to-white p-4 ring-1 ring-[#BFDBFE]">
+            <p className="inline-flex items-center gap-1.5 text-[12px] font-bold text-[#0F3DDE]">
+              <Sparkles size={14} /> Latest coaching tip
+            </p>
+            <p className="mt-2 text-[13px] leading-relaxed text-slate-600">
+              Strong communication, but tighten STAR structure on conflict questions. Lead with the
+              situation in one sentence, then quantify the action result.
+            </p>
+            <PillButton className="mt-4" onClick={() => window.alert("AI coaching tips unlocked (demo).")}>
+              <Sparkles size={14} /> Improve with AI
+            </PillButton>
+          </div>
+        </WhiteCard>
+
+        <section
+          className={clsx(
+            "rounded-[22px] p-5 text-white shadow-lg",
+            "bg-gradient-to-br from-[#071526] via-[#0B1F3A] to-[#122F6B]",
+          )}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-blue-200">Live Voice Interview</p>
+              <h3 className="mt-1 font-display text-xl font-extrabold">
+                {liveOn ? "Listening…" : "Mic ready when you are"}
+              </h3>
+              <p className="mt-1 text-[12px] text-blue-100">
+                {role} · {difficulty} · {duration}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span
+                className={clsx(
+                  "flex h-14 w-14 items-center justify-center rounded-full ring-4",
+                  liveOn ? "animate-pulse bg-emerald-500 ring-emerald-400/40" : "bg-white/10 ring-white/10",
+                )}
+              >
+                <Mic size={22} />
+              </span>
+              <PillButton
+                tone="white"
+                onClick={() => {
+                  setLiveOn((v) => !v);
+                  if (!started) setStarted(true);
+                }}
+              >
+                {liveOn ? "End" : "Go Live"}
+              </PillButton>
+            </div>
+          </div>
+          {liveOn ? (
+            <div className="mt-4 flex h-10 items-end gap-1">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="flex-1 rounded-t bg-sky-400/80"
+                  style={{ height: `${20 + ((i * 17) % 70)}%` }}
+                />
+              ))}
+            </div>
+          ) : null}
+        </section>
+
+        <WhiteCard title="Practice Categories">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {CATEGORIES.map((c) => {
+              const Icon = c.icon;
+              return (
+                <button
+                  key={c.label}
+                  type="button"
+                  onClick={() => window.alert(`Opening ${c.label} drills…`)}
+                  className="flex items-center gap-3 rounded-[16px] bg-[#F8FAFC] p-3 text-left ring-1 ring-slate-100 transition hover:-translate-y-0.5"
+                >
+                  <SoftIcon icon={Icon} className={c.tone} />
+                  <span className="text-[13px] font-extrabold text-[#0B1F3A]">{c.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </WhiteCard>
+
+        <WhiteCard
+          title="Questions You Should Practice Today"
+          action={
+            <button
+              type="button"
+              className="text-[12px] font-bold text-[#0F3DDE]"
+              onClick={() => window.alert("Refreshing set…")}
+            >
+              Shuffle
+            </button>
+          }
+        >
+          <ul className="space-y-2.5">
+            {PRACTICE_Qs.map((item) => (
+              <li
+                key={item.q}
+                className="flex flex-wrap items-center gap-3 rounded-2xl bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13px] font-bold text-[#0B1F3A]">{item.q}</p>
+                  <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-[#0F3DDE]">
+                    {item.tag}
+                  </span>
+                </div>
+                <span className="text-[12px] font-extrabold text-slate-500">{item.score}/100</span>
+                <PillButton tone="outline" className="!px-3 !py-1.5" onClick={() => window.alert("Improve with AI…")}>
+                  Improve with AI
+                </PillButton>
+              </li>
+            ))}
+          </ul>
+        </WhiteCard>
+
+        <WhiteCard title="Performance Over Time">
+          <MultiLineChart />
+        </WhiteCard>
+
+        <WhiteCard
+          title="5-Day Interview Plan"
+          action={
+            <PillButton className="!py-1.5 !text-[11px]" onClick={() => setPlanOpen(true)}>
+              Generate 5-Day Plan
+            </PillButton>
+          }
+        >
+          {planOpen ? (
+            <ul className="space-y-2">
+              {PLAN.map((p) => (
+                <li
+                  key={p.day}
+                  className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5 ring-1 ring-slate-100"
+                >
+                  <div>
+                    <p className="text-[12px] font-extrabold text-[#0F3DDE]">{p.day}</p>
+                    <p className="text-[13px] font-bold text-[#0B1F3A]">{p.focus}</p>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500">{p.mins} min</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-[13px] text-slate-500">
+              Tap Generate to build a personalized mock schedule for the week.
+            </p>
+          )}
+        </WhiteCard>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <PillButton tone="outline" onClick={() => window.alert("Downloading report…")}>
+            <Download size={14} /> Download
+          </PillButton>
+          <PillButton tone="outline" onClick={() => window.alert("Share link copied.")}>
+            <Share2 size={14} /> Share
+          </PillButton>
+          <PillButton onClick={() => window.alert("Mock interview booked.")}>
+            <Calendar size={14} /> Book Mock
+          </PillButton>
+          <PillButton tone="dark" onClick={() => window.alert("Opening saved answers…")}>
+            <Trophy size={14} /> Saved
+          </PillButton>
+        </div>
+      </CollagePage>
     </StudentShell>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { StudentShell } from "@/components/student-shell";
-import { StudentBottomNav } from "@/components/student-home/bottom-nav";
 import { SchoolHome } from "@/components/student-home/school-home";
 import { CompetitiveHome } from "@/components/student-home/competitive-home";
 import { CollegeHome } from "@/components/student-home/college-home";
@@ -98,8 +97,6 @@ export default function StudentDashboard() {
           <CollegeHome firstName={firstName} onChangeGoal={() => setPickerOpen(true)} />
         ) : null}
       </div>
-
-      <StudentBottomNav variant={track} />
     </StudentShell>
   );
 }
