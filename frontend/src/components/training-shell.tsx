@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { RoleNavItem, RoleShell, KpiGrid, DataTable, ModuleCard } from "@/components/role-shell";
+import { SoftAreaChart } from "@/components/ui/charts";
 
 export const trainingNav: RoleNavItem[] = [
   { href: "/dashboard/training", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -42,19 +43,37 @@ export function TrainingHome() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Training Institute Dashboard</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Training Partner Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Phase 2 — manage courses, trainers, assessments, certificates and revenue.
+          Students, courses, revenue, completions, certifications, mocks, mentors and batches.
         </p>
       </div>
       <KpiGrid
         items={[
-          { label: "Active Courses", value: "18", sub: "Published catalog", tint: "bg-blue-50 text-blue-700" },
-          { label: "Trainers", value: "12", sub: "Verified faculty", tint: "bg-emerald-50 text-emerald-700" },
-          { label: "Active Students", value: "1,246", sub: "Across batches", tint: "bg-violet-50 text-violet-700" },
-          { label: "MTD Revenue", value: "₹ 4.8L", sub: "Wallet settlements", tint: "bg-amber-50 text-amber-700" },
+          { label: "Students", value: "1,246", sub: "Across batches", tint: "bg-violet-50 text-violet-700" },
+          { label: "Courses", value: "18", sub: "Published catalog", tint: "bg-blue-50 text-blue-700" },
+          { label: "Revenue", value: "₹ 4.8L", sub: "MTD settlements", tint: "bg-amber-50 text-amber-700" },
+          { label: "Completion Rate", value: "76%", sub: "Course finishers", tint: "bg-emerald-50 text-emerald-700" },
+          { label: "Certifications", value: "418", sub: "Issued this quarter", tint: "bg-sky-50 text-sky-700" },
+          { label: "Mock Tests", value: "92", sub: "Live assessments", tint: "bg-rose-50 text-rose-700" },
+          { label: "Mentors", value: "12", sub: "Verified faculty", tint: "bg-indigo-50 text-indigo-700" },
+          { label: "Batches", value: "24", sub: "Running cohorts", tint: "bg-orange-50 text-orange-700" },
         ]}
       />
+      <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <h3 className="mb-2 text-sm font-bold text-slate-800">Revenue trend</h3>
+        <SoftAreaChart
+          data={[
+            { name: "Jan", value: 2.1 },
+            { name: "Feb", value: 2.8 },
+            { name: "Mar", value: 3.4 },
+            { name: "Apr", value: 3.9 },
+            { name: "May", value: 4.2 },
+            { name: "Jun", value: 4.8 },
+          ]}
+          color="#F59E0B"
+        />
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <ModuleCard
           title="Instructor authoring"
@@ -62,7 +81,7 @@ export function TrainingHome() {
           action={
             <Link
               href="/dashboard/training/courses"
-              className="inline-flex rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white"
+              className="inline-flex rounded-xl bg-[#0F3DDE] px-4 py-2 text-sm font-semibold text-white"
             >
               Manage courses
             </Link>

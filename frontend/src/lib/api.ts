@@ -72,7 +72,7 @@ export async function api<T = unknown>(
     const msg = err instanceof Error ? err.message : "Network error";
     if (msg === "Failed to fetch") {
       throw new Error(
-        `Cannot reach API at ${base}. Keep the local backend + Cloudflare tunnel running, then hard-refresh.`,
+        `Cannot reach API at ${base}. Start the backend (npm run dev:api) and hard-refresh this page.`,
       );
     }
     throw err instanceof Error ? err : new Error(String(err));

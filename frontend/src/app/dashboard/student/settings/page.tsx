@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { StudentShell } from "@/components/student-shell";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
@@ -51,9 +52,12 @@ export default function Page() {
   return (
     <StudentShell>
       <div className="mx-auto max-w-2xl space-y-5 p-4 lg:p-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-          <p className="mt-1 text-sm text-slate-500">Update profile and password for your account.</p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
+            <p className="mt-1 text-sm text-slate-500">Update profile, password and appearance.</p>
+          </div>
+          <ThemeToggle />
         </div>
         {msg && (
           <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{msg}</p>
@@ -80,7 +84,7 @@ export default function Page() {
               onChange={(e) => setName(e.target.value)}
             />
           </label>
-          <button type="submit" className="rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white">
+          <button type="submit" className="rounded-xl bg-[#0F3DDE] px-4 py-2 text-sm font-semibold text-white">
             Save profile
           </button>
         </form>

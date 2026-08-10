@@ -14,6 +14,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { RoleNavItem, RoleShell, KpiGrid, DataTable, ModuleCard } from "@/components/role-shell";
+import { SoftBarChart } from "@/components/ui/charts";
 
 export const partnerNav: RoleNavItem[] = [
   { href: "/dashboard/partner", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -46,17 +47,33 @@ export function PartnerHome() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Channel Partner Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Phase 2 — referrals, commission ledger, payouts and marketing collateral.
+          Referrals, admissions, commission, payouts, conversion and partner rank analytics.
         </p>
       </div>
       <KpiGrid
         items={[
-          { label: "Active Leads", value: "84", sub: "This month", tint: "bg-blue-50 text-blue-700" },
-          { label: "Conversions", value: "23", sub: "Paid enrolments", tint: "bg-emerald-50 text-emerald-700" },
-          { label: "Commission Due", value: "₹ 36,200", sub: "Wallet balance", tint: "bg-violet-50 text-violet-700" },
-          { label: "Partner Tier", value: "Silver", sub: "Next: Gold at ₹1L", tint: "bg-amber-50 text-amber-700" },
+          { label: "Referrals", value: "84", sub: "This month", tint: "bg-blue-50 text-blue-700" },
+          { label: "Admissions", value: "23", sub: "Converted seats", tint: "bg-emerald-50 text-emerald-700" },
+          { label: "Commission", value: "₹ 36,200", sub: "Earned MTD", tint: "bg-violet-50 text-violet-700" },
+          { label: "Pending Payouts", value: "₹ 12,400", sub: "Clears Fri", tint: "bg-amber-50 text-amber-700" },
+          { label: "Conversion Rate", value: "27%", sub: "Lead → paid", tint: "bg-sky-50 text-sky-700" },
+          { label: "Partner Rank", value: "Silver", sub: "Next Gold @ ₹1L", tint: "bg-indigo-50 text-indigo-700" },
+          { label: "Performance", value: "+18%", sub: "vs last month", tint: "bg-rose-50 text-rose-700" },
+          { label: "Active Schools", value: "31", sub: "Referral network", tint: "bg-orange-50 text-orange-700" },
         ]}
       />
+      <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <h3 className="mb-2 text-sm font-bold text-slate-800">Performance analytics</h3>
+        <SoftBarChart
+          data={[
+            { name: "Wk1", value: 12 },
+            { name: "Wk2", value: 18 },
+            { name: "Wk3", value: 15 },
+            { name: "Wk4", value: 23 },
+          ]}
+          color="#7C3AED"
+        />
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <ModuleCard
           title="Your referral link"
@@ -64,7 +81,7 @@ export function PartnerHome() {
           action={
             <button
               type="button"
-              className="rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white"
+              className="rounded-xl bg-[#0F3DDE] px-4 py-2 text-sm font-semibold text-white"
               onClick={() => navigator.clipboard?.writeText("https://ellowring.com/r/PARTNER-DEMO")}
             >
               Copy link

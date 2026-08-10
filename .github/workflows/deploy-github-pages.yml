@@ -34,14 +34,21 @@ jobs:
         working-directory: frontend
         env:
           GITHUB_PAGES: "true"
-          NEXT_PUBLIC_API_URL: https://custody-forgot-reprints-powell.trycloudflare.com/api/v1
+          # Prefer repo Variable/Secret; fall back to tunnel for public Pages demo.
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL != '' && vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL != '' && secrets.NEXT_PUBLIC_API_URL || 'https://custody-forgot-reprints-powell.trycloudflare.com/api/v1' }}
           NEXT_PUBLIC_BASE_PATH: /Ellowring_App
           NEXT_PUBLIC_OLD_WEBSITE_URL: https://sbramajayam.github.io/E-website-app
         run: npm run build
 
-      - name: Ensure Pages serves _next
+      - name: Write runtime-config for Pages
         working-directory: frontend
-        run: touch out/.nojekyll
+        env:
+          API_URL: ${{ vars.NEXT_PUBLIC_API_URL != '' && vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL != '' && secrets.NEXT_PUBLIC_API_URL || 'https://custody-forgot-reprints-powell.trycloudflare.com/api/v1' }}
+        run: |
+          cat > out/runtime-config.js << EOF
+          window.__ELLOWRING_API_URL__ = "${API_URL}";
+          EOF
+          touch out/.nojekyll
 
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4

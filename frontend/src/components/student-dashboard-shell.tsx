@@ -96,7 +96,10 @@ export function StudentDashboardShell({
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F3F6FB] text-slate-500">
+      <div
+        className="flex min-h-screen items-center justify-center bg-[#F3F6FB] text-slate-500"
+        suppressHydrationWarning
+      >
         Loading dashboard…
       </div>
     );

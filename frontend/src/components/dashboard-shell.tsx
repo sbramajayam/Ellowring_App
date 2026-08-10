@@ -75,7 +75,9 @@ export function DashboardShell({
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-slate">Loading dashboard…</div>
+      <div className="flex min-h-screen items-center justify-center text-slate" suppressHydrationWarning>
+        Loading dashboard…
+      </div>
     );
   }
 

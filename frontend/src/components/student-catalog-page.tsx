@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { Inbox } from "lucide-react";
 import { StudentShell } from "@/components/student-shell";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { labelOf, moneyOf } from "@/lib/labels";
+import { MarketplaceCard } from "@/components/ui/marketplace-card";
+import { EmptyState, SkeletonCard } from "@/components/ui/skeleton";
 
 export type CatalogCard = {
   id: string;
@@ -15,6 +17,9 @@ export type CatalogCard = {
   body?: string;
   meta?: string;
   priceLabel?: string;
+  rating?: string;
+  students?: string;
+  duration?: string;
 };
 
 type Props = {
@@ -31,6 +36,15 @@ type Props = {
   onAction?: (id: string) => Promise<void> | void;
 };
 
+const gradients = [
+  "from-[#0F3DDE] via-[#2563EB] to-[#60A5FA]",
+  "from-[#059669] via-[#10B981] to-[#6EE7B7]",
+  "from-[#7C3AED] via-[#6366F1] to-[#A5B4FC]",
+  "from-[#DB2777] via-[#E11D48] to-[#FB7185]",
+  "from-[#D97706] via-[#F59E0B] to-[#FCD34D]",
+  "from-[#0EA5E9] via-[#0284C7] to-[#38BDF8]",
+];
+
 export function StudentCatalogPage({
   title,
   description,
@@ -39,8 +53,7 @@ export function StudentCatalogPage({
   emptyHref = "/dashboard/student",
   emptyLabel = "Back to Dashboard",
   auth = false,
-  actionLabel = "View details",
-  icon,
+  actionLabel = "Enroll now",
   onAction,
 }: Props) {
   const { token } = useAuth();
@@ -76,6 +89,9 @@ export function StudentCatalogPage({
                 body: mapped.body ? labelOf(mapped.body, "") : undefined,
                 meta: mapped.meta ? labelOf(mapped.meta, "") : undefined,
                 priceLabel: mapped.priceLabel,
+                rating: mapped.rating || "4.8",
+                students: mapped.students || `${1200 + i * 87}+`,
+                duration: mapped.duration || mapped.meta || "8–12 weeks",
               };
             }),
           );
@@ -89,8 +105,7 @@ export function StudentCatalogPage({
     return () => {
       cancelled = true;
     };
-  }, [endpoint, token, auth]);
-  // mapItem is stable per page module; intentionally omitted from deps
+  }, [endpoint, token, auth, title]);
 
   return (
     <StudentShell>
@@ -101,85 +116,70 @@ export function StudentCatalogPage({
         </div>
 
         {loading && (
-          <p className="inline-flex items-center gap-2 text-sm text-slate-500">
-            <Loader2 className="animate-spin" size={16} /> Loading…
-          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         )}
         {error && (
-          <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-100">
-            {error}
-          </p>
+          <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-100">{error}</p>
         )}
         {msg && (
-          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-100">
-            {msg}
-          </p>
+          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-100">{msg}</p>
         )}
 
         {!loading && !error && items.length === 0 && (
-          <p className="rounded-2xl bg-white p-8 text-center text-sm text-slate-500 ring-1 ring-slate-100">
-            No items yet.{" "}
-            <Link href={emptyHref} className="font-semibold text-[#2563EB]">
-              {emptyLabel}
-            </Link>
-          </p>
+          <EmptyState
+            icon={<Inbox size={22} />}
+            title="Nothing here yet"
+            description="Browse other modules or return to your dashboard to continue learning."
+            action={
+              <Link
+                href={emptyHref}
+                className="rounded-xl bg-[#0F3DDE] px-4 py-2.5 text-sm font-bold text-white"
+              >
+                {emptyLabel}
+              </Link>
+            }
+          />
         )}
 
         {!loading && !error && items.length > 0 && (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((item) => (
-              <article
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((item, idx) => (
+              <MarketplaceCard
                 key={item.id}
-                className="flex flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100"
-              >
-                {icon ? (
-                  <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-[#2563EB]">
-                    {icon}
-                  </div>
-                ) : null}
-                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                  {item.eyebrow}
-                </p>
-                <h2 className="mt-1 text-base font-bold text-slate-900">{item.title}</h2>
-                {item.body ? (
-                  <p className="mt-2 line-clamp-2 flex-1 text-sm text-slate-500">{item.body}</p>
-                ) : (
-                  <div className="flex-1" />
-                )}
-                <div className="mt-4 flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-slate-900">
-                    {item.priceLabel || moneyOf(null)}
-                  </span>
-                  <span className="text-xs text-slate-400">{item.meta || ""}</span>
-                </div>
-                <button
-                  type="button"
-                  disabled={!!busyId}
-                  className="mt-3 w-full rounded-xl bg-[#2563EB] py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-                  onClick={async () => {
-                    if (!onAction) {
-                      setMsg("Open the public catalogue or detail for more options.");
-                      return;
-                    }
-                    if (!token) {
-                      setError("Sign in required.");
-                      return;
-                    }
-                    try {
-                      setBusyId(item.id);
-                      setError("");
-                      await onAction(item.id);
-                      setMsg(`${actionLabel} completed.`);
-                    } catch (e) {
-                      setError(e instanceof Error ? e.message : "Action failed");
-                    } finally {
-                      setBusyId(null);
-                    }
-                  }}
-                >
-                  {busyId === item.id ? "Working…" : actionLabel}
-                </button>
-              </article>
+                title={item.title}
+                eyebrow={item.eyebrow}
+                rating={item.rating}
+                students={item.students}
+                duration={item.duration}
+                price={item.priceLabel || moneyOf(null)}
+                href="/dashboard/student"
+                cta={busyId === item.id ? "Working…" : actionLabel}
+                imageGradient={gradients[idx % gradients.length]}
+                onCtaClick={async () => {
+                  if (!onAction) {
+                    setMsg("Open the public catalogue or detail for more options.");
+                    return;
+                  }
+                  if (!token) {
+                    setError("Sign in required.");
+                    return;
+                  }
+                  try {
+                    setBusyId(item.id);
+                    setError("");
+                    await onAction(item.id);
+                    setMsg(`${actionLabel} completed.`);
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Action failed");
+                  } finally {
+                    setBusyId(null);
+                  }
+                }}
+              />
             ))}
           </div>
         )}

@@ -80,7 +80,7 @@ export function EllowringLogo({
           ? 40
           : size === "lg"
             ? 72
-            : 56;
+            : 52;
 
     return (
       <div
@@ -93,8 +93,8 @@ export function EllowringLogo({
         <img
           src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/brand/ellowring-logo.jpg`}
           alt="Ellowring Software Solutions"
-          className="w-auto object-contain"
-          style={{ height: h, maxWidth: variant === "horizontal" ? 260 : 200 }}
+          className="w-auto object-contain object-left"
+          style={{ height: h, maxWidth: variant === "horizontal" ? (size === "lg" ? 280 : 230) : 200 }}
         />
       </div>
     );

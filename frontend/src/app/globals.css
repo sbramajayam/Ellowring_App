@@ -8,43 +8,43 @@
 
 :root {
   /* ── Primary brand ───────────────────────────────────────── */
-  --royal-50: #eff6ff;
-  --royal-100: #dbeafe;
-  --royal-200: #bfdbfe;
-  --royal-300: #93c5fd;
-  --royal-400: #60a5fa;
-  --royal-500: #3b82f6;
-  --royal-600: #2563eb;
-  --royal-700: #1d4ed8;
-  --royal-800: #1e40af;
-  --royal-900: #1e3a8a;
+  --royal-50: #eef2ff;
+  --royal-100: #e0e7ff;
+  --royal-200: #c7d2fe;
+  --royal-300: #a5b4fc;
+  --royal-400: #818cf8;
+  --royal-500: #2563eb;
+  --royal-600: #0f3dde;
+  --royal-700: #0c32b8;
+  --royal-800: #0a2894;
+  --royal-900: #081f70;
 
-  --navy-700: #123056;
-  --navy-800: #0b1f3a;
-  --navy-900: #071526;
+  --navy-700: #1f2937;
+  --navy-800: #111827;
+  --navy-900: #0b1220;
 
   --white: #ffffff;
-  --page: #f4f7fb;
+  --page: #f8fafc;
   --card: #ffffff;
-  --muted: #f8fafc;
+  --muted: #f1f5f9;
   --border: #e2e8f0;
 
   /* Logo secondary accents */
-  --accent-red: #ef4444;
+  --accent-red: #dc2626;
   --accent-yellow: #f59e0b;
-  --accent-green: #10b981;
+  --accent-green: #16a34a;
   --accent-sky: #0ea5e9;
-  --accent-purple: #8b5cf6;
+  --accent-purple: #7c3aed;
 
-  --text: #0f172a;
+  --text: #111827;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   --text-inverse: #ffffff;
 
-  --success: #10b981;
+  --success: #16a34a;
   --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #0ea5e9;
+  --danger: #dc2626;
+  --info: #2563eb;
 
   /* Spacing / radius / elevation */
   --radius-sm: 8px;
@@ -58,7 +58,7 @@
   --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1);
   --shadow-xl: 0 24px 48px rgba(11, 31, 58, 0.14);
-  --shadow-glow: 0 10px 30px rgba(37, 99, 235, 0.28);
+  --shadow-glow: 0 10px 30px rgba(15, 61, 222, 0.28);
 
   --font-display: var(--font-jakarta), system-ui, sans-serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
@@ -80,7 +80,7 @@
   --mist: var(--royal-50);
   --paper: var(--page);
   --line: var(--border);
-  --glow: rgba(37, 99, 235, 0.22);
+  --glow: rgba(15, 61, 222, 0.22);
   --radius: var(--radius-lg);
   --shadow: var(--shadow-lg);
 }
@@ -333,4 +333,39 @@ a {
 
 .login-float {
   animation: loginFloat 5.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes confettiPop {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-28px) scale(1);
+    opacity: 0;
+  }
+}
+
+.page-enter {
+  animation: loginRise 0.45s var(--ease-premium);
+}
+
+.hover-lift {
+  transition:
+    transform var(--motion-base) var(--ease-premium),
+    box-shadow var(--motion-base) var(--ease-premium);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
