@@ -812,6 +812,7 @@ model CoachingProgram {
   price       Decimal   @default(0) @db.Decimal(14, 2)
   duration    String?
   batchSize   Int?
+  thumbnail   String?
   isPublished Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

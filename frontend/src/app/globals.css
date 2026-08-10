@@ -1,106 +1,234 @@
 @import "tailwindcss";
 
 /**
- * Ellowring Phase 6 — Design Tokens
- * Spec: docs/Ellowring_UI_UX_Design_System.md
- * TS mirror: src/lib/design-tokens.ts
+ * Ellowring Phase 6 — Design Tokens (CSS)
+ * Spec: docs/Ellowring_UI_UX_Design_System.md §19
+ * TS mirror: frontend/src/lib/design-tokens.ts
+ * Keep values identical — verified by scripts/check-token-parity.mjs
  */
 
 :root {
-  /* ── Primary brand ───────────────────────────────────────── */
-  --royal-50: #eef2ff;
-  --royal-100: #e0e7ff;
-  --royal-200: #c7d2fe;
-  --royal-300: #a5b4fc;
-  --royal-400: #818cf8;
-  --royal-500: #2563eb;
-  --royal-600: #0f3dde;
-  --royal-700: #0c32b8;
-  --royal-800: #0a2894;
-  --royal-900: #081f70;
+  /* ── Brand primary (Royal Blue scale) ─────────────────────── */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
 
-  --navy-700: #1f2937;
-  --navy-800: #111827;
-  --navy-900: #0b1220;
-
-  --white: #ffffff;
-  --page: #f8fafc;
-  --card: #ffffff;
-  --muted: #f1f5f9;
-  --border: #e2e8f0;
+  --color-white: #ffffff;
+  --color-navy-950: #0b1f3a;
+  --color-navy-900: #102a4c;
+  --color-navy-800: #16345e;
+  --color-navy-700: #1d4270;
+  --color-slate-600: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0;
+  --color-slate-100: #f1f5f9;
+  --color-slate-50: #f8fafc;
 
   /* Logo secondary accents */
-  --accent-red: #dc2626;
-  --accent-yellow: #f59e0b;
-  --accent-green: #16a34a;
-  --accent-sky: #0ea5e9;
-  --accent-purple: #7c3aed;
+  --color-red-500: #ef4444;
+  --color-red-700: #b91c1c;
+  --color-yellow-500: #f59e0b;
+  --color-yellow-700: #b45309;
+  --color-green-500: #22c55e;
+  --color-green-700: #15803d;
+  --color-sky-500: #0ea5e9;
+  --color-sky-700: #0369a1;
+  --color-purple-500: #8b5cf6;
+  --color-purple-700: #6d28d9;
 
-  --text: #111827;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-inverse: #ffffff;
+  /* Semantic (Light) */
+  --color-canvas: var(--color-slate-100);
+  --color-surface: var(--color-white);
+  --color-surface-elevated: var(--color-white);
+  --color-ink: var(--color-navy-950);
+  --color-ink-muted: var(--color-slate-600);
+  --color-border: var(--color-slate-200);
+  --color-primary: var(--color-primary-600);
+  --color-primary-hover: var(--color-primary-700);
+  --color-primary-active: var(--color-primary-800);
+  --color-success: var(--color-green-700);
+  --color-success-icon: var(--color-green-500);
+  --color-warning: var(--color-yellow-700);
+  --color-warning-icon: var(--color-yellow-500);
+  --color-danger: var(--color-red-700);
+  --color-danger-icon: var(--color-red-500);
+  --color-info: var(--color-sky-700);
+  --color-info-icon: var(--color-sky-500);
+  --color-premium: var(--color-purple-500);
 
-  --success: #16a34a;
-  --warning: #f59e0b;
-  --danger: #dc2626;
-  --info: #2563eb;
+  /* Typography — layout.tsx sets --font-jakarta / --font-inter;
+     --font-plus-jakarta is the Chapter 19 canonical alias */
+  --font-plus-jakarta: var(--font-jakarta);
+  --font-display: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
 
-  /* Spacing / radius / elevation */
+  /* Radius */
+  --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-full: 9999px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1);
-  --shadow-xl: 0 24px 48px rgba(11, 31, 58, 0.14);
-  --shadow-glow: 0 10px 30px rgba(15, 61, 222, 0.28);
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
 
-  --font-display: var(--font-jakarta), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
+  /* Shadow / elevation */
+  --shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.04);
+  --shadow-sm: 0 2px 8px rgba(11, 31, 58, 0.06);
+  --shadow-md: 0 8px 24px rgba(11, 31, 58, 0.08);
+  --shadow-lg: 0 16px 40px rgba(11, 31, 58, 0.1);
+  --shadow-xl: 0 24px 60px rgba(11, 31, 58, 0.14);
+  --shadow-2xl: 0 32px 80px rgba(11, 31, 58, 0.18);
+  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.35);
+  --shadow-glow: 0 10px 30px rgba(37, 99, 235, 0.28);
 
-  --motion-fast: 120ms;
-  --motion-base: 200ms;
-  --motion-slow: 320ms;
+  /* Motion */
+  --duration-instant: 80ms;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-moderate: 240ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* Legacy aliases (marketing surfaces still referencing green theme) */
-  --forest: var(--navy-800);
-  --canopy: var(--royal-600);
-  --mint: var(--royal-500);
-  --leaf: var(--royal-300);
-  --sun: var(--accent-yellow);
-  --ember: var(--accent-red);
-  --ink: var(--text);
-  --slate: var(--text-secondary);
-  --mist: var(--royal-50);
-  --paper: var(--page);
-  --line: var(--border);
-  --glow: rgba(15, 61, 222, 0.22);
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  --gradient-navy: linear-gradient(180deg, #0b1f3a 0%, #122f6b 100%);
+  --gradient-mesh: radial-gradient(at 20% 20%, rgba(37, 99, 235, 0.12) 0, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(14, 165, 233, 0.1) 0, transparent 40%),
+    radial-gradient(at 80% 80%, rgba(139, 92, 246, 0.08) 0, transparent 45%);
+
+  /* ── Backward-compatible aliases (existing classNames) ────── */
+  --royal-50: var(--color-primary-50);
+  --royal-100: var(--color-primary-100);
+  --royal-200: var(--color-primary-200);
+  --royal-300: var(--color-primary-300);
+  --royal-400: var(--color-primary-400);
+  --royal-500: var(--color-primary-600);
+  --royal-600: #0f3dde;
+  --royal-700: var(--color-primary-700);
+  --royal-800: var(--color-primary-800);
+  --royal-900: var(--color-primary-900);
+
+  --navy-700: var(--color-navy-700);
+  --navy-800: #111827;
+  --navy-900: var(--color-navy-950);
+
+  --white: var(--color-white);
+  --page: var(--color-slate-50);
+  --card: var(--color-surface);
+  --muted: var(--color-slate-100);
+  --border: var(--color-border);
+
+  --accent-red: var(--color-red-500);
+  --accent-yellow: var(--color-yellow-500);
+  --accent-green: var(--color-green-500);
+  --accent-sky: var(--color-sky-500);
+  --accent-purple: var(--color-purple-500);
+
+  --text: var(--color-ink);
+  --text-secondary: var(--color-ink-muted);
+  --text-muted: var(--color-slate-400);
+  --text-inverse: var(--color-white);
+
+  --success: var(--color-success);
+  --warning: var(--color-warning);
+  --danger: var(--color-danger);
+  --info: var(--color-info);
+
   --radius: var(--radius-lg);
   --shadow: var(--shadow-lg);
+  --glow: rgba(37, 99, 235, 0.22);
+
+  --motion-fast: var(--duration-fast);
+  --motion-base: var(--duration-base);
+  --motion-slow: var(--duration-slow);
+
+  /* Very old marketing aliases */
+  --forest: var(--color-navy-800);
+  --canopy: var(--royal-600);
+  --mint: var(--color-primary);
+  --leaf: var(--color-primary-300);
+  --sun: var(--accent-yellow);
+  --ember: var(--accent-red);
+  --ink: var(--color-ink);
+  --slate: var(--color-ink-muted);
+  --mist: var(--color-primary-50);
+  --paper: var(--page);
+  --line: var(--color-border);
 }
 
 [data-theme="dark"] {
-  --page: #071526;
-  --card: #0b1f3a;
-  --muted: #123056;
-  --border: #1e3a5f;
-  --text: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  --paper: #071526;
-  --mist: #123056;
-  --line: #1e3a5f;
-  --ink: #f8fafc;
-  --slate: #cbd5e1;
+  --color-canvas: var(--color-navy-950);
+  --color-surface: var(--color-navy-900);
+  --color-surface-elevated: var(--color-navy-800);
+  --color-ink: var(--color-slate-50);
+  --color-ink-muted: var(--color-slate-400);
+  --color-border: var(--color-navy-700);
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: #60a5fa;
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55);
+
+  --page: var(--color-canvas);
+  --card: var(--color-surface);
+  --muted: var(--color-navy-800);
+  --border: var(--color-border);
+  --text: var(--color-ink);
+  --text-secondary: var(--color-ink-muted);
+  --text-muted: var(--color-slate-500);
+  --paper: var(--page);
+  --mist: var(--color-navy-800);
+  --line: var(--color-border);
+  --ink: var(--color-ink);
+  --slate: var(--color-ink-muted);
 }
 
 @theme inline {
+  --color-primary-50: var(--color-primary-50);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  --color-premium: var(--color-premium);
+
   --color-royal-50: var(--royal-50);
   --color-royal-100: var(--royal-100);
   --color-royal-600: var(--royal-600);
@@ -108,20 +236,19 @@
   --color-navy-800: var(--navy-800);
   --color-page: var(--page);
   --color-card: var(--card);
-  --color-border: var(--border);
   --color-forest: var(--forest);
   --color-canopy: var(--canopy);
   --color-mint: var(--mint);
   --color-leaf: var(--leaf);
   --color-sun: var(--sun);
   --color-ember: var(--ember);
-  --color-ink: var(--ink);
-  --color-slate: var(--slate);
   --color-mist: var(--mist);
   --color-paper: var(--paper);
   --color-line: var(--line);
+
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
+  --radius-DEFAULT: var(--radius-md);
 }
 
 * {
@@ -134,7 +261,7 @@ html {
 
 body {
   margin: 0;
-  color: var(--text);
+  color: var(--color-ink);
   background: var(--page);
   font-family: var(--font-body);
   min-height: 100%;
@@ -171,28 +298,50 @@ a {
     linear-gradient(135deg, #0b1f3a, #2563eb 55%, #0b1f3a);
 }
 
-/* Phase 6 buttons */
+.gradient-mesh {
+  background-image: var(--gradient-mesh);
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: var(--radius-full);
-  background: var(--royal-600);
-  color: var(--text-inverse);
-  padding: 0.85rem 1.4rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 0.75rem 1.35rem;
+  min-height: 40px;
   font-weight: 600;
   font-family: var(--font-display);
+  font-size: 14px;
   transition:
-    transform var(--motion-base) var(--ease-premium),
-    background var(--motion-base) var(--ease-premium),
-    box-shadow var(--motion-base) var(--ease-premium);
+    transform var(--duration-fast) var(--ease-standard),
+    background var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
   box-shadow: var(--shadow-glow);
 }
 
-.btn-primary:hover {
-  background: var(--royal-700);
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+  background: var(--color-primary-active);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-secondary {
@@ -201,55 +350,73 @@ a {
   justify-content: center;
   gap: 0.5rem;
   border-radius: var(--radius-full);
-  border: 1.5px solid var(--border);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--text);
-  padding: 0.85rem 1.4rem;
+  border: 1.5px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  padding: 0.75rem 1.35rem;
+  min-height: 40px;
   font-weight: 600;
   font-family: var(--font-display);
-  backdrop-filter: blur(10px);
+  font-size: 14px;
   transition:
-    border-color var(--motion-base) var(--ease-premium),
-    transform var(--motion-base) var(--ease-premium);
+    border-color var(--duration-fast) var(--ease-standard),
+    background var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
-.btn-secondary:hover {
-  border-color: var(--royal-400);
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary-50);
   transform: translateY(-1px);
 }
 
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .surface {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
 
 .input {
   width: 100%;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 0.8rem 1rem;
-  background: var(--white);
-  color: var(--text);
+  background: var(--color-surface);
+  color: var(--color-ink);
   outline: none;
   font-family: var(--font-body);
   transition:
-    border-color var(--motion-fast) var(--ease-premium),
-    box-shadow var(--motion-fast) var(--ease-premium);
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .input:focus {
-  border-color: var(--royal-500);
-  box-shadow: 0 0 0 4px var(--glow);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--color-slate-100);
 }
 
 .ds-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
 }
 
 .ds-badge {
@@ -261,12 +428,12 @@ a {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: var(--royal-50);
-  color: var(--royal-700);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
 }
 
 .shine {
-  animation: floaty 7s ease-in-out infinite;
+  animation: floaty 7s var(--ease-standard) infinite;
 }
 
 @keyframes floaty {
@@ -290,7 +457,7 @@ a {
 
 .draw-ring {
   stroke-dasharray: 360;
-  animation: drawring 2.2s ease forwards;
+  animation: drawring 2.2s var(--ease-decelerate) forwards;
 }
 
 @keyframes loginRise {
@@ -324,15 +491,15 @@ a {
 }
 
 .login-rise {
-  animation: loginRise 0.55s ease-out;
+  animation: loginRise var(--duration-slow) var(--ease-decelerate);
 }
 
 .login-fade {
-  animation: loginFade 0.7s ease-out;
+  animation: loginFade var(--duration-slow) var(--ease-decelerate);
 }
 
 .login-float {
-  animation: loginFloat 5.5s ease-in-out infinite;
+  animation: loginFloat 5.5s var(--ease-standard) infinite;
 }
 
 @keyframes shimmer {
@@ -356,16 +523,26 @@ a {
 }
 
 .page-enter {
-  animation: loginRise 0.45s var(--ease-premium);
+  animation: loginRise var(--duration-moderate) var(--ease-premium);
 }
 
 .hover-lift {
   transition:
-    transform var(--motion-base) var(--ease-premium),
-    box-shadow var(--motion-base) var(--ease-premium);
+    transform var(--duration-base) var(--ease-premium),
+    box-shadow var(--duration-base) var(--ease-premium);
 }
 
 .hover-lift:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

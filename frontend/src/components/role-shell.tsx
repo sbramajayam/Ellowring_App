@@ -80,7 +80,7 @@ export function RoleShell({
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
-      <div className="mx-auto flex min-h-screen max-w-[1600px]">
+      <div className="flex min-h-screen w-full">
         <aside
           className={clsx(
             "fixed inset-y-0 left-0 z-40 flex w-[250px] flex-col border-r border-slate-200/90 bg-white transition-transform lg:static lg:translate-x-0",

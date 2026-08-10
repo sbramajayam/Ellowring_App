@@ -109,7 +109,7 @@ export function StudentCatalogPage({
 
   return (
     <StudentShell>
-      <div className="mx-auto max-w-6xl space-y-5 p-4 lg:p-6">
+      <div className="w-full space-y-5 p-4 lg:p-6 xl:px-10" style={{ maxWidth: "none" }}>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
           <p className="mt-1 text-sm text-slate-500">{description}</p>

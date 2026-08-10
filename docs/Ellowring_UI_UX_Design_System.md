@@ -3616,35 +3616,31 @@ This design system is implemented in the Ellowring Next.js frontend as follows, 
 | Lucide icons | `lucide-react` package, imported per-icon in component files | No custom SVG icon set is maintained outside brand/logo assets |
 | Logo component | `frontend/src/components/ellowring-logo.tsx` | Existing `EllowringLogo`/`EllowringMark` components implement the lockups defined in Chapter 1.2; continue to extend this file for any new lockup variant rather than creating a parallel logo component |
 
-## 26.1 Migration Notes from Current Implementation
+## 26.1 Implementation Status (Synced)
 
-**`FR-IMPL-001`** — At the time of writing, `frontend/src/app/globals.css` and `frontend/src/app/layout.tsx` implement an earlier green/forest-toned brand system (`Syne` + `DM_Sans`, forest/canopy/mint color tokens) used by the pre-Phase-6 marketing site. Phase 6 implementation work MUST:
+**`FR-IMPL-001` — COMPLETED.** As of Phase 6 code sync:
 
-1. Introduce `Plus_Jakarta_Sans` and `Inter` via `next/font/google` in `layout.tsx`, replacing `Syne`/`DM_Sans`, and update the `--font-display`/`--font-body` CSS variable mapping in `globals.css` accordingly.
-2. Replace the forest/canopy/mint/leaf/sun/ember token set in `globals.css` with the Royal Blue + Dark Navy + White + five-secondary-color system defined in Chapter 3 and tokenized in full in Chapter 19.2, preserving the existing `@theme inline` Tailwind-mapping pattern already in place.
-3. Introduce the `[data-theme="dark"]` selector block (Chapter 16/19.2) alongside the existing `:root` block; wire the theme toggle described in Chapter 16.4 into `frontend/src/lib/` (a new `theme-context.tsx`, following the existing `auth-context.tsx`/`i18n.tsx` provider pattern already used in `layout.tsx`).
-4. Create `frontend/src/lib/design-tokens.ts` per Chapter 19.4 and add a CI check (`FR-TOK-001`) that fails the build if the numeric values in `design-tokens.ts` and the CSS variables in `globals.css` diverge.
-5. Rebuild `.btn-primary`, `.btn-secondary`, `.input`, `.surface` utility classes in `globals.css` to reference the new token names (`var(--color-primary)`, `var(--radius-sm)`, etc.) instead of the current forest-palette variables, preserving class names so existing component call-sites in `frontend/src/components/` and `frontend/src/app/` continue to work without a mass find-and-replace.
-6. Retain and restyle (do not delete) the existing motion keyframes (`floaty`, `drawring`, `loginRise`, `loginFade`, `loginFloat`) in `globals.css` — they already implement several Chapter 12–13 motion moments (logo ring-draw, login panel entrance) and only need duration/easing alignment to the tokens in Chapter 12.1–12.2, not a rewrite.
+| Requirement | Status | Location |
+|---|---|---|
+| Plus Jakarta Sans + Inter via `next/font/google` | Done | `frontend/src/app/layout.tsx` (`--font-jakarta`, `--font-inter`); CSS alias `--font-plus-jakarta` |
+| Royal Blue + Dark Navy + White + 5 secondary accents | Done | `frontend/src/app/globals.css` Chapter 19.2 token set |
+| `[data-theme="dark"]` + ThemeToggle | Done | `globals.css`, `frontend/src/lib/theme-context.tsx`, wrapped in `layout.tsx` |
+| Typed TS tokens (Chapter 19.4) | Done | `frontend/src/lib/design-tokens.ts` |
+| Token parity check (`FR-TOK-001`) | Done | `scripts/check-token-parity.mjs` — run `node scripts/check-token-parity.mjs` |
+| `.btn-primary` / `.btn-secondary` / `.input` / `.surface` on new tokens | Done | `globals.css` (legacy class names preserved) |
+| Motion keyframes retained + duration aligned | Done | `floaty`, `drawring`, `loginRise`, `loginFade`, `loginFloat`, `prefers-reduced-motion` |
+| Backward-compatible CSS aliases (`--royal-*`, `--page`, `--forest`, etc.) | Done | Alias block in `:root` so existing screens do not break |
 
-## 26.2 Token Parity CI Check (Recommended Implementation)
+**Remaining (product build, not foundations):** implement every Chapter 20 component as a standalone React module and bind every Chapter 24 screen 1:1 to Figma Desktop/Mobile/Light frames. Foundations no longer block that work.
 
-```ts
-// scripts/check-token-parity.ts (recommended addition)
-// Fails CI if globals.css custom properties and design-tokens.ts diverge numerically.
-import { colors, radius, spacing } from "../frontend/src/lib/design-tokens";
-import fs from "node:fs";
+## 26.2 Token Parity CI Check
 
-const css = fs.readFileSync("frontend/src/app/globals.css", "utf-8");
-function assertTokenInCss(name: string, value: string) {
-  if (!css.includes(value)) {
-    throw new Error(`Token mismatch: ${name} (${value}) not found in globals.css`);
-  }
-}
-assertTokenInCss("color.primary.600", colors.primary[600]);
-assertTokenInCss("radius.md", `${radius.md}px`);
-assertTokenInCss("spacing.6", `${spacing[6]}px`);
+```bash
+# From repository root
+node scripts/check-token-parity.mjs
 ```
+
+The script asserts that Chapter 19 hex/px/ms values from `design-tokens.ts` appear in `frontend/src/app/globals.css`. Exit code `1` fails CI when tokens drift.
 
 ---
 

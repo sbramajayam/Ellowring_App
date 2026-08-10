@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Prisma } from '@prisma/client';
+import { Prisma, WalletLedgerType } from '@prisma/client';
 
 @Controller('wallet')
 @UseGuards(JwtAuthGuard)
@@ -9,11 +9,56 @@ export class WalletController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
-  async get(@Req() req: any) {
+  async get(@Req() req: any, @Query('limit') limit?: string) {
     const student = await this.prisma.student.findUnique({ where: { userId: req.user.userId } });
     if (!student) return { error: 'Student wallet not available for this role' };
-    return this.prisma.wallet.findUnique({
+    const take = Math.min(Number(limit) || 20, 100);
+    let wallet = await this.prisma.wallet.findUnique({
       where: { studentId: student.id },
+      include: { ledger: { orderBy: { createdAt: 'desc' }, take } },
+    });
+    if (!wallet) {
+      wallet = await this.prisma.wallet.create({
+        data: { studentId: student.id, balance: 0, currency: 'INR' },
+        include: { ledger: { orderBy: { createdAt: 'desc' }, take } },
+      });
+    }
+    return wallet;
+  }
+
+  @Post('top-up')
+  async topUp(@Req() req: any, @Body() body: { amount?: number; description?: string }) {
+    const student = await this.prisma.student.findUnique({ where: { userId: req.user.userId } });
+    if (!student) throw new BadRequestException('Student profile required');
+
+    const amount = Math.round(Number(body.amount) || 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException('Amount must be a positive number');
+    }
+    if (amount > 100000) throw new BadRequestException('Max top-up is ₹1,00,000');
+
+    let wallet = await this.prisma.wallet.findUnique({ where: { studentId: student.id } });
+    if (!wallet) {
+      wallet = await this.prisma.wallet.create({
+        data: { studentId: student.id, balance: 0, currency: 'INR' },
+      });
+    }
+
+    const newBalance = new Prisma.Decimal(Number(wallet.balance) + amount);
+    return this.prisma.wallet.update({
+      where: { studentId: student.id },
+      data: {
+        balance: { increment: amount },
+        ledger: {
+          create: {
+            amount,
+            type: WalletLedgerType.CREDIT,
+            description: body.description || 'Wallet Top-up',
+            balanceAfter: newBalance,
+            reference: `topup-${Date.now().toString(36)}`,
+          },
+        },
+      },
       include: { ledger: { orderBy: { createdAt: 'desc' }, take: 20 } },
     });
   }

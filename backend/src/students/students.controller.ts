@@ -29,10 +29,34 @@ export class StudentsController {
   @Get('me')
   async me(@Req() req: any) {
     const student = await this.students.resolveStudent(req.user.userId);
-    return this.prisma.student.findUnique({
+    const profile = await this.prisma.student.findUnique({
       where: { id: student.id },
-      include: { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } } },
+      include: {
+        user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } },
+        educationHistory: { orderBy: { createdAt: 'desc' }, take: 10 },
+        careerInterests: { orderBy: { priority: 'asc' }, take: 20 },
+        studentSkills: { include: { skill: true }, take: 30 },
+      },
     });
+    if (!profile) return null;
+
+    const fields = [
+      profile.user?.name,
+      profile.user?.email,
+      profile.user?.phone,
+      profile.grade,
+      profile.stream,
+      profile.city,
+      profile.state,
+      profile.bio,
+      profile.resumeUrl,
+      profile.educationHistory?.length ? 'edu' : null,
+      profile.careerInterests?.length || profile.studentSkills?.length ? 'skills' : null,
+    ];
+    const filled = fields.filter(Boolean).length;
+    const completionPct = Math.round((filled / fields.length) * 100);
+
+    return { ...profile, completionPct };
   }
 
   @Patch('me')
@@ -40,6 +64,9 @@ export class StudentsController {
     @Req() req: any,
     @Body()
     body: {
+      name?: string;
+      phone?: string;
+      avatarUrl?: string;
       dateOfBirth?: string;
       gender?: string;
       grade?: string;
@@ -51,13 +78,48 @@ export class StudentsController {
       resumeUrl?: string;
       linkedinUrl?: string;
       githubUrl?: string;
+      interests?: string;
+      skills?: string;
     },
   ) {
     const student = await this.students.resolveStudent(req.user.userId);
+
+    if (body.name !== undefined || body.phone !== undefined || body.avatarUrl !== undefined) {
+      await this.prisma.user.update({
+        where: { id: req.user.userId },
+        data: {
+          ...(body.name !== undefined ? { name: String(body.name).trim() } : {}),
+          ...(body.phone !== undefined ? { phone: body.phone || null } : {}),
+          ...(body.avatarUrl !== undefined ? { avatarUrl: body.avatarUrl || null } : {}),
+        },
+      });
+    }
+
+    if (body.interests !== undefined) {
+      const titles = String(body.interests)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+      await this.prisma.careerInterest.deleteMany({ where: { studentId: student.id } });
+      if (titles.length) {
+        await this.prisma.careerInterest.createMany({
+          data: titles.map((title, i) => ({
+            studentId: student.id,
+            title,
+            category: 'general',
+            priority: i + 1,
+          })),
+        });
+      }
+    }
+
     return this.prisma.student.update({
       where: { id: student.id },
       data: {
-        ...(body.dateOfBirth !== undefined ? { dateOfBirth: new Date(body.dateOfBirth) } : {}),
+        ...(body.dateOfBirth !== undefined
+          ? { dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null }
+          : {}),
         ...(body.gender !== undefined ? { gender: body.gender } : {}),
         ...(body.grade !== undefined ? { grade: body.grade } : {}),
         ...(body.stream !== undefined ? { stream: body.stream } : {}),
@@ -68,6 +130,11 @@ export class StudentsController {
         ...(body.resumeUrl !== undefined ? { resumeUrl: body.resumeUrl } : {}),
         ...(body.linkedinUrl !== undefined ? { linkedinUrl: body.linkedinUrl } : {}),
         ...(body.githubUrl !== undefined ? { githubUrl: body.githubUrl } : {}),
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } },
+        educationHistory: { orderBy: { createdAt: 'desc' }, take: 10 },
+        careerInterests: { orderBy: { priority: 'asc' }, take: 20 },
       },
     });
   }

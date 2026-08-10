@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -14,6 +17,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { CollegesService } from './colleges.service';
+import { slugify } from '../common/marketplace-company';
 
 @Controller('colleges')
 export class CollegesController {
@@ -30,8 +34,50 @@ export class CollegesController {
         ...(city ? { city } : {}),
         ...(state ? { state } : {}),
       },
+      include: {
+        rankings: { orderBy: [{ year: 'desc' }, { rank: 'asc' }], take: 3 },
+      },
       orderBy: { name: 'asc' },
       take: 100,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'COLLEGE', 'TRAINING')
+  @Post()
+  async create(@Body() body: any) {
+    const name = String(body.name || '').trim();
+    if (!name) throw new BadRequestException('Name is required');
+    const college = await this.prisma.college.create({
+      data: {
+        name,
+        slug: slugify(name, 'college'),
+        code: body.code || null,
+        type: body.type || null,
+        city: body.city || null,
+        state: body.state || null,
+        website: body.website || null,
+        description: body.description || null,
+        logoUrl: body.logoUrl || null,
+        isVerified: body.isVerified === undefined ? false : Boolean(body.isVerified),
+      },
+      include: { rankings: true },
+    });
+    const nirf = body.nirfRank !== undefined && body.nirfRank !== '' ? Number(body.nirfRank) : null;
+    if (nirf && Number.isFinite(nirf)) {
+      await this.prisma.collegeRanking.create({
+        data: {
+          collegeId: college.id,
+          source: 'NIRF',
+          rank: nirf,
+          year: new Date().getFullYear(),
+          category: body.nirfCategory || 'Overall',
+        },
+      });
+    }
+    return this.prisma.college.findUnique({
+      where: { id: college.id },
+      include: { rankings: { orderBy: [{ year: 'desc' }, { rank: 'asc' }], take: 3 } },
     });
   }
 
@@ -181,6 +227,60 @@ export class CollegesController {
         description: body.description,
       },
     });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'COLLEGE', 'TRAINING')
+  @Patch(':id')
+  async updateCollege(@Param('id') id: string, @Body() body: any) {
+    const existing = await this.prisma.college.findFirst({ where: { id, deletedAt: null } });
+    if (!existing) throw new NotFoundException('College not found');
+    const data: Record<string, unknown> = {};
+    if (body.name !== undefined) data.name = String(body.name).trim();
+    if (body.code !== undefined) data.code = body.code || null;
+    if (body.type !== undefined) data.type = body.type || null;
+    if (body.city !== undefined) data.city = body.city || null;
+    if (body.state !== undefined) data.state = body.state || null;
+    if (body.website !== undefined) data.website = body.website || null;
+    if (body.description !== undefined) data.description = body.description || null;
+    if (body.logoUrl !== undefined) data.logoUrl = body.logoUrl || null;
+    if (body.isVerified !== undefined) data.isVerified = Boolean(body.isVerified);
+    await this.prisma.college.update({ where: { id }, data });
+    if (body.nirfRank !== undefined && body.nirfRank !== '') {
+      const year = new Date().getFullYear();
+      await this.prisma.collegeRanking.upsert({
+        where: {
+          collegeId_source_year_category: {
+            collegeId: id,
+            source: 'NIRF',
+            year,
+            category: body.nirfCategory || 'Overall',
+          },
+        },
+        create: {
+          collegeId: id,
+          source: 'NIRF',
+          rank: Number(body.nirfRank),
+          year,
+          category: body.nirfCategory || 'Overall',
+        },
+        update: { rank: Number(body.nirfRank) },
+      });
+    }
+    return this.prisma.college.findUnique({
+      where: { id },
+      include: { rankings: { orderBy: [{ year: 'desc' }, { rank: 'asc' }], take: 3 } },
+    });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'COLLEGE', 'TRAINING')
+  @Delete(':id')
+  async removeCollege(@Param('id') id: string) {
+    const existing = await this.prisma.college.findFirst({ where: { id, deletedAt: null } });
+    if (!existing) throw new NotFoundException('College not found');
+    await this.prisma.college.update({ where: { id }, data: { deletedAt: new Date() } });
+    return { success: true, id };
   }
 
   @Get(':id')

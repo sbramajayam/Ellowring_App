@@ -63,7 +63,9 @@ export function NotificationCenter({
         aria-label="Notifications"
       >
         <Bell size={20} strokeWidth={1.75} />
-        <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#DC2626] ring-2 ring-[#F8FAFC]" />
+        <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#DC2626] px-1 text-[9px] font-bold text-white ring-2 ring-white">
+          3
+        </span>
       </button>
 
       {open ? (

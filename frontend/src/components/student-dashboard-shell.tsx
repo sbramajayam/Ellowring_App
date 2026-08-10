@@ -216,7 +216,7 @@ export function StudentDashboardShell({
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-[1600px]">
+      <div className="flex w-full">
         {/* Desktop sidebar */}
         <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-[240px] shrink-0 overflow-y-auto border-r border-slate-200/80 bg-white lg:block">
           {Sidebar}

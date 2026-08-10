@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import {
   Award,
   Bell,
@@ -25,7 +25,6 @@ import {
   Layers,
   Lightbulb,
   LogOut,
-  Menu,
   MessageSquare,
   Rocket,
   Search,
@@ -58,9 +57,9 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { href: "/dashboard/student/coaching?track=neet", label: "NEET Coaching", icon: GraduationCap },
       { href: "/dashboard/student/coaching?track=jee", label: "JEE Coaching", icon: GraduationCap },
-      { href: "/dashboard/student/coaching", label: "Competitive Exams", icon: Flame },
+      { href: "/dashboard/student/coaching?track=competitive", label: "Competitive Exams", icon: Flame },
       { href: "/dashboard/student/courses", label: "Courses", icon: BookOpen },
-      { href: "/dashboard/student/courses", label: "Study Material", icon: FileText },
+      { href: "/dashboard/student/study-material", label: "Study Material", icon: FileText },
       { href: "/dashboard/student/mock-tests", label: "Mock Tests", icon: ClipboardCheck },
       { href: "/dashboard/student/previous-papers", label: "Previous Year Papers", icon: ClipboardList },
     ],
@@ -73,7 +72,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
       { href: "/dashboard/student/admissions", label: "Admissions", icon: ClipboardList },
       { href: "/dashboard/student/study-abroad", label: "Study Abroad", icon: Globe2 },
       { href: "/dashboard/student/ai-hub#scholarship", label: "Scholarships", icon: Award },
-      { href: "/dashboard/student/ai-hub#resume", label: "Resume Builder", icon: FileText },
+      { href: "/dashboard/student/resume", label: "Resume Builder", icon: FileText },
     ],
   },
   {
@@ -89,10 +88,10 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "Productivity",
     items: [
-      { href: "/dashboard/student/ai-hub#planner", label: "Calendar", icon: CalendarDays },
-      { href: "/dashboard/student/courses", label: "Tasks", icon: CheckSquare },
-      { href: "/dashboard/student/courses", label: "Bookmarks", icon: Bookmark },
-      { href: "/dashboard/student/ai-hub", label: "AI Mentor", icon: Bot },
+      { href: "/dashboard/student/calendar", label: "Calendar", icon: CalendarDays },
+      { href: "/dashboard/student/ai-hub#planner", label: "Tasks", icon: CheckSquare },
+      { href: "/dashboard/student/bookmarks", label: "Bookmarks", icon: Bookmark },
+      { href: "/dashboard/student/ai-assistant", label: "AI Mentor", icon: Bot },
       { href: "/dashboard/student/wallet", label: "Wallet", icon: Wallet },
       { href: "/dashboard/student/messages", label: "Messages", icon: MessageSquare },
       { href: "/dashboard/student/notifications", label: "Notifications", icon: Bell },
@@ -110,21 +109,66 @@ const searchIndex = [
   { label: "AI Hub", href: "/dashboard/student/ai-hub" },
   { label: "Internships", href: "/dashboard/student/internships" },
   { label: "Jobs", href: "/dashboard/student/jobs" },
-  { label: "Resume Builder", href: "/dashboard/student/ai-hub#resume" },
+  { label: "Resume Builder", href: "/dashboard/student/resume" },
   { label: "Ellowring Pro", href: "/dashboard/student/premium" },
   { label: "Certificates", href: "/dashboard/student/certificates" },
 ];
 
-function isActive(pathname: string, href: string, exact?: boolean) {
-  const base = href.split("?")[0].split("#")[0];
-  if (exact) return pathname === base;
-  return pathname === base || pathname.startsWith(`${base}/`);
+function isActive(
+  pathname: string,
+  searchParams: URLSearchParams,
+  href: string,
+  exact?: boolean,
+) {
+  const [pathPart, queryPart] = href.split("?");
+  const base = pathPart.split("#")[0];
+  const hash = href.includes("#") ? href.split("#")[1] : "";
+
+  if (exact) {
+    return pathname === base && !queryPart;
+  }
+
+  // Path must match first
+  const pathOk = pathname === base || pathname.startsWith(`${base}/`);
+  if (!pathOk) return false;
+
+  // If href has query params, ALL of them must match current URL (and for track, exact)
+  if (queryPart) {
+    const required = new URLSearchParams(queryPart.split("#")[0]);
+    for (const [key, value] of required.entries()) {
+      if (searchParams.get(key) !== value) return false;
+    }
+    // Special case: coaching menus — if href has track, don't activate siblings
+    if (required.has("track")) {
+      return searchParams.get("track") === required.get("track");
+    }
+    return true;
+  }
+
+  // Href has no query: only active when current URL also has no conflicting track on same path
+  if (base === "/dashboard/student/coaching" && searchParams.get("track")) {
+    return false;
+  }
+
+  // Hash-only links (e.g. ai-hub#resume): treat path match as enough for sidebar
+  if (hash) return pathname === base;
+
+  return true;
 }
 
 export function StudentShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <StudentShellInner>{children}</StudentShellInner>
+    </Suspense>
+  );
+}
+
+function StudentShellInner({ children }: { children: React.ReactNode }) {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -141,7 +185,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, router, hydrated]);
 
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => setOpen(false), [pathname, searchParams]);
 
   const results = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -166,7 +210,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
-      <div className="mx-auto flex min-h-screen max-w-[1600px]">
+      <div className="flex min-h-screen w-full">
         <aside
           className={clsx(
             "fixed inset-y-0 left-0 z-40 flex w-[270px] flex-col border-r border-slate-200/90 bg-white transition-transform lg:static lg:translate-x-0",
@@ -196,7 +240,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const Icon = item.icon;
-                    const active = isActive(pathname, item.href, item.exact);
+                    const active = isActive(pathname, searchParams, item.href, item.exact);
                     return (
                       <Link
                         key={`${group.title}-${item.label}`}
@@ -260,64 +304,26 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-slate-200/90 bg-[#F8FAFC]/90 px-4 backdrop-blur-xl lg:h-[68px] lg:gap-6 lg:px-8">
-            <button
-              type="button"
-              className="shrink-0 rounded-lg p-2 hover:bg-white lg:hidden"
-              onClick={() => setOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={18} />
-            </button>
-
-            <form onSubmit={onSearchSubmit} className="relative min-w-0 max-w-[560px] flex-1">
-              <Search
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                size={16}
-              />
-              <input
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setSearchOpen(true);
-                }}
-                onFocus={() => setSearchOpen(true)}
-                placeholder="Search courses, colleges, exams, jobs, AI tools…"
-                className="w-full rounded-full border border-slate-200 bg-white py-2.5 pl-11 pr-14 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#0F3DDE] focus:ring-4 focus:ring-blue-100"
-              />
-              <span className="pointer-events-none absolute right-3.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-slate-200 bg-[#F8FAFC] px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 sm:inline">
-                ⌘K
-              </span>
-              {searchOpen && results.length > 0 ? (
-                <div className="absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-                  {results.map((r) => (
-                    <Link
-                      key={r.href + r.label}
-                      href={r.href}
-                      onClick={() => {
-                        setSearch("");
-                        setSearchOpen(false);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-[#EEF2FF]"
-                    >
-                      <Sparkles size={14} className="text-[#0F3DDE]" />
-                      {r.label}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-            </form>
-
-            <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
-              <NotificationCenter />
-              <Link
-                href="/dashboard/student/messages"
-                className="rounded-full p-2.5 text-slate-500 transition hover:bg-white hover:text-[#0F3DDE]"
-                aria-label="Messages"
+          <header className="sticky top-0 z-20 border-b border-slate-200/90 bg-white/95 backdrop-blur-xl">
+            {/* Mobile — matches mock: logo left, search / bell / profile right */}
+            <div className="flex h-14 items-center gap-1 px-3 lg:hidden">
+              <button
+                type="button"
+                className="min-w-0 flex-1 text-left"
+                onClick={() => setOpen(true)}
+                aria-label="Open menu"
               >
-                <MessageSquare size={20} strokeWidth={1.75} />
-              </Link>
-              <div className="mx-2 hidden h-8 w-px bg-slate-200 sm:block" />
+                <EllowringLogo variant="horizontal" size="sm" />
+              </button>
+              <button
+                type="button"
+                className="rounded-full p-2 text-slate-500 hover:bg-slate-50"
+                aria-label="Search"
+                onClick={() => setSearchOpen((v) => !v)}
+              >
+                <Search size={20} strokeWidth={1.75} />
+              </button>
+              <NotificationCenter />
               <ProfileDropdown
                 name={firstName}
                 roleLabel="Student"
@@ -330,9 +336,85 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
                 }}
               />
             </div>
+            {searchOpen ? (
+              <form onSubmit={onSearchSubmit} className="border-t border-slate-100 px-3 py-2 lg:hidden">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search…"
+                  className="w-full rounded-full border border-slate-200 bg-[#F8FAFC] px-4 py-2 text-sm outline-none focus:border-[#2563EB]"
+                />
+              </form>
+            ) : null}
+
+            {/* Desktop header */}
+            <div className="hidden h-[68px] items-center gap-6 px-8 lg:flex">
+              <form onSubmit={onSearchSubmit} className="relative min-w-0 max-w-[560px] flex-1">
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={16}
+                />
+                <input
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setSearchOpen(true);
+                  }}
+                  onFocus={() => setSearchOpen(true)}
+                  placeholder="Search courses, colleges, exams, jobs, AI tools…"
+                  className="w-full rounded-full border border-slate-200 bg-white py-2.5 pl-11 pr-14 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#0F3DDE] focus:ring-4 focus:ring-blue-100"
+                />
+                <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-[#F8FAFC] px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
+                  ⌘K
+                </span>
+                {searchOpen && results.length > 0 ? (
+                  <div className="absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    {results.map((r) => (
+                      <Link
+                        key={r.href + r.label}
+                        href={r.href}
+                        onClick={() => {
+                          setSearch("");
+                          setSearchOpen(false);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-[#EEF2FF]"
+                      >
+                        <Sparkles size={14} className="text-[#0F3DDE]" />
+                        {r.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </form>
+
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                <NotificationCenter />
+                <Link
+                  href="/dashboard/student/messages"
+                  className="rounded-full p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-[#0F3DDE]"
+                  aria-label="Messages"
+                >
+                  <MessageSquare size={20} strokeWidth={1.75} />
+                </Link>
+                <div className="mx-2 h-8 w-px bg-slate-200" />
+                <ProfileDropdown
+                  name={firstName}
+                  roleLabel="Student"
+                  profileHref="/dashboard/student/profile"
+                  settingsHref="/dashboard/student/settings"
+                  premiumHref="/dashboard/student/premium"
+                  onLogout={() => {
+                    logout();
+                    router.push("/");
+                  }}
+                />
+              </div>
+            </div>
           </header>
 
-          <main className="page-enter flex-1">{children}</main>
+          <main className="page-enter min-h-0 w-full max-w-none flex-1 overflow-y-auto bg-[#FAFBFC]">
+            {children}
+          </main>
         </div>
       </div>
     </div>

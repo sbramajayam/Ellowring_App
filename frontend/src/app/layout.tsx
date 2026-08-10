@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { I18nProvider } from "@/lib/i18n";
+import { ThemeProvider } from "@/lib/theme-context";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -46,7 +47,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         <I18nProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeProvider>
         </I18nProvider>
       </body>
     </html>
