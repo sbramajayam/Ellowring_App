@@ -1,0 +1,20 @@
+1:"$Sreact.fragment"
+2:I[97367,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+7:I[97367,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"ViewportBoundary"]
+8:I[97367,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"MetadataBoundary"]
+9:I[27201,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"IconMark"]
+b:I[39756,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"default"]
+c:I[37457,["/Ellowring_App/_next/static/chunks/0yyzqot0gu87h.js"],"default"]
+6:X
+e:X
+e:C
+0:{"buildId":"Ygm2rkvyqBoBkn2N5Zioe","data":[{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"mx-auto max-w-3xl px-4 py-14 md:px-6","children":[["$","p",null,{"className":"text-sm font-semibold uppercase tracking-[0.2em] text-canopy","children":"Contact"}],["$","h1",null,{"className":"mt-2 font-display text-4xl font-bold md:text-6xl","children":"Let's talk."}],["$","form",null,{"className":"mt-10 surface space-y-4 rounded-3xl p-6 md:p-8","children":[["$","input",null,{"className":"input","placeholder":"Full name"}],["$","input",null,{"className":"input","placeholder":"Email","type":"email"}],["$","textarea",null,{"className":"input min-h-32","placeholder":"How can we help?"}],["$","button",null,{"className":"btn-primary","type":"button","children":"Send message"}],["$","p",null,{"className":"text-sm text-slate","children":"Or email hello@ellowring.com"}]]}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":"$@5","staleTime":"$6","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$L7",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L8",null,{"children":["$","$3",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Ellowring — Learn. Prepare. Build. Get Hired."}],["$","meta","1",{"name":"description","content":"From 11th Standard to First Job — India's AI-powered Education, Career & Hiring ecosystem."}],["$","link","2",{"rel":"icon","href":"/Ellowring_App/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L9","3",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@a","staleTime":"$6","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lb",null,{"parallelRouterKey":"children","template":["$","$Lc",null,{}]}]]}],"isPartial":"$@d","staleTime":"$6","varyParams":"$e"}],"isUpgradeableISRFallback":false,"a":"$@f","rootVaryParams":null,"needsRuntimeRequest":"$@10"}
+4:null
+10:true
+6:300
+6:C
+f:0
+a:"$undefined"
+d:"$undefined"
+5:"$undefined"

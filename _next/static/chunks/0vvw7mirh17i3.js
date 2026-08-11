@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,18799,e=>{"use strict";var l=e.i(43476),o=e.i(38457);e.s(["default",0,function(){return(0,l.jsx)(o.CollegeShell,{children:(0,l.jsx)(o.CollegeHome,{})})}])}]);
