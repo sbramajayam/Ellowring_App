@@ -1,10 +1,13 @@
 const FALLBACK_API = "http://localhost:4001/api/v1";
 
 /** Dead quick-tunnel hosts that still appear in stale GitHub Pages caches */
-const DEAD_API_HOSTS = ["wheels-fossil-surge-elimination.trycloudflare.com"];
+const DEAD_API_HOSTS = [
+  "wheels-fossil-surge-elimination.trycloudflare.com",
+  "metallica-for-dual-bubble.trycloudflare.com",
+];
 
 /** Current public demo API (Cloudflare quick tunnel → local Nest on :4001) */
-const LIVE_PAGES_API = "https://metallica-for-dual-bubble.trycloudflare.com/api/v1";
+const LIVE_PAGES_API = "https://powerful-baptist-possibilities-persian.trycloudflare.com/api/v1";
 
 function sanitizeApiBase(raw: string): string {
   const base = raw.replace(/\/$/, "");
