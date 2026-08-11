@@ -131,56 +131,47 @@ export function CollegeHome({
         </button>
       </div>
 
-      {/* 2. Four separate blue metric cards */}
-      <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
-        <article className="min-w-[200px] shrink-0 rounded-[22px] bg-gradient-to-br from-[#0B1F3A] via-[#0F3DDE] to-[#3B82F6] p-4 text-white shadow-[0_14px_30px_rgba(15,61,222,0.28)] lg:min-w-0">
-          <p className="text-[11px] font-semibold text-blue-100">Skill Progress</p>
-          <div className="mt-2 flex items-center gap-3">
-            <ScoreRing value={78} label="done" size={78} tone="mixed" onDark />
-            <p className="text-[12px] font-semibold leading-snug text-blue-50">
-              <span className="block font-display text-[15px] font-extrabold text-white">12/15 Skills</span>
-              Keep learning!
-            </p>
-          </div>
-        </article>
-
-        <article className="min-w-[200px] shrink-0 rounded-[22px] bg-gradient-to-br from-[#0B1F3A] via-[#0F3DDE] to-[#3B82F6] p-4 text-white shadow-[0_14px_30px_rgba(15,61,222,0.28)] lg:min-w-0">
-          <p className="text-[11px] font-semibold text-blue-100">Internships</p>
-          <div className="mt-3 flex items-start gap-3">
-            <SoftIcon icon={Briefcase} className="h-12 w-12 rounded-2xl bg-white/15 text-white" />
-            <div>
-              <p className="font-display text-[22px] font-extrabold leading-none">2 Active</p>
-              <p className="mt-2 text-[12px] font-semibold text-blue-100">0 Completed</p>
+      {/* 2. Single blue metrics banner (mockup: one composition, 4 cells) */}
+      <BlueHero className="!p-4 lg:!p-5">
+        <div className="relative z-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6 lg:divide-x lg:divide-white/15">
+          <div className="flex items-center gap-3 lg:pr-4">
+            <ScoreRing value={78} size={76} tone="mixed" onDark />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-blue-100">Skill Progress</p>
+              <p className="mt-0.5 font-display text-[15px] font-extrabold leading-tight">12 / 15 Skills</p>
+              <p className="text-[11px] text-blue-100">78% done</p>
             </div>
           </div>
-        </article>
-
-        <article className="min-w-[200px] shrink-0 rounded-[22px] bg-gradient-to-br from-[#0B1F3A] via-[#0F3DDE] to-[#3B82F6] p-4 text-white shadow-[0_14px_30px_rgba(15,61,222,0.28)] lg:min-w-0">
-          <p className="text-[11px] font-semibold text-blue-100">Profile Completion</p>
-          <div className="mt-2 flex items-center gap-3">
-            <ScoreRing value={85} size={78} tone="green" onDark />
-            <div>
-              <p className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-blue-50">
-                <UserRound size={14} /> Almost there
+          <div className="flex items-center gap-3 lg:px-4">
+            <SoftIcon icon={Briefcase} className="h-12 w-12 shrink-0 rounded-2xl bg-white/15 text-white" />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-blue-100">Internships</p>
+              <p className="mt-0.5 font-display text-[20px] font-extrabold leading-none">2 Active</p>
+              <p className="mt-1 text-[11px] text-blue-100">0 Completed</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 lg:px-4">
+            <ScoreRing value={85} size={76} tone="green" onDark />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-blue-100">Profile Completion</p>
+              <p className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-bold">
+                <UserRound size={13} /> Almost there!
               </p>
-              <p className="mt-1 text-[11px] text-blue-100">Complete to 100%</p>
+              <p className="text-[11px] text-blue-100">Complete to 100%</p>
             </div>
           </div>
-        </article>
-
-        <article className="min-w-[200px] shrink-0 rounded-[22px] bg-gradient-to-br from-[#0B1F3A] via-[#0F3DDE] to-[#3B82F6] p-4 text-white shadow-[0_14px_30px_rgba(15,61,222,0.28)] lg:min-w-0">
-          <p className="text-[11px] font-semibold text-blue-100">Career Readiness</p>
-          <div className="mt-2 flex items-center gap-3">
-            <ScoreRing value={74} size={78} tone="blue" onDark />
-            <div>
-              <p className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-blue-50">
-                <Target size={14} /> Good Going
+          <div className="flex items-center gap-3 lg:pl-4">
+            <ScoreRing value={74} size={76} tone="blue" onDark />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-blue-100">Career Readiness Score</p>
+              <p className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-bold">
+                <Target size={13} /> Good Going!
               </p>
-              <p className="mt-1 text-[11px] text-blue-100">Keep it up 💪</p>
+              <p className="text-[11px] text-blue-100">74 / 100</p>
             </div>
           </div>
-        </article>
-      </div>
+        </div>
+      </BlueHero>
 
       {/* 3. Quick Access */}
       <section>
@@ -340,23 +331,30 @@ export function CollegeHome({
         </div>
       </section>
 
-      {/* 7. Promo banner */}
-      <BlueHero className="!p-5 lg:!p-6">
-        <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-xl">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-blue-100">Ellowring</p>
-            <h2 className="mt-1 font-display text-xl font-extrabold lg:text-2xl">All Internships. Provided by Ellowring</h2>
-            <p className="mt-1.5 text-[13px] text-blue-100">
-              Real projects • Real mentors • Real experience. Build your career with us.
+      {/* 7. Promo banner — campus/office illustration plane (mockup) */}
+      <BlueHero className="!p-0 overflow-hidden">
+        <div className="relative z-10 grid min-h-[160px] lg:grid-cols-[1.2fr_1fr]">
+          <div className="flex flex-col justify-center p-5 lg:p-7">
+            <h2 className="font-display text-xl font-extrabold leading-snug lg:text-[26px]">
+              All Internships.
+              <br />
+              Provided by Ellowring.
+            </h2>
+            <p className="mt-2 max-w-md text-[13px] text-blue-100">
+              Real projects • Real mentors • Real experience.
             </p>
-            <PillButton href="/dashboard/student/internships" tone="white" className="mt-4">
+            <PillButton href="/dashboard/student/internships" tone="white" className="mt-4 w-fit">
               Explore Internships →
             </PillButton>
           </div>
-          <div className="hidden shrink-0 items-center gap-2 rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/15 sm:flex">
-            <SoftIcon icon={Briefcase} className="bg-white/20 text-white" />
-            <SoftIcon icon={GraduationCap} className="bg-white/20 text-white" />
-            <SoftIcon icon={Target} className="bg-white/20 text-white" />
+          <div className="relative hidden min-h-[160px] lg:block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80"
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-90"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0F3DDE]/40 to-[#0F3DDE]" />
           </div>
         </div>
       </BlueHero>

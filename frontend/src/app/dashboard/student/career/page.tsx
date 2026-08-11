@@ -8,23 +8,30 @@ import {
   Bot,
   Briefcase,
   Building2,
+  Check,
   CheckCircle2,
   Circle,
+  Code2,
   Compass,
+  Database,
+  Flag,
   Flame,
-  GraduationCap,
-  Lightbulb,
+  Heart,
+  Layout,
+  Lock,
+  MapPin,
   Mic,
   Rocket,
   Send,
+  Server,
   Sparkles,
+  Star,
   Target,
   TrendingUp,
 } from "lucide-react";
 import clsx from "clsx";
 import { StudentShell } from "@/components/student-shell";
 import {
-  AiAssistantChip,
   BlueHero,
   CollagePage,
   CollageTitle,
@@ -36,78 +43,127 @@ import { useAuth } from "@/lib/auth-context";
 
 const METRICS = [
   {
-    label: "Profile Fit",
+    label: "Profile Fit Score",
     value: "85%",
+    hint: "Great Match!",
     spark: [62, 68, 71, 74, 78, 82, 85],
     color: "#0F3DDE",
   },
   {
-    label: "Confidence",
+    label: "Career Confidence",
     value: "72%",
+    hint: "Keep Improving!",
     spark: [48, 52, 55, 60, 64, 68, 72],
-    color: "#22C55E",
+    color: "#8B5CF6",
   },
   {
-    label: "Salary",
+    label: "Future Salary Prediction",
     value: "₹12.5 LPA",
+    hint: "Expected",
     spark: [8, 9, 9.5, 10, 11, 12, 12.5],
-    color: "#38BDF8",
+    color: "#22C55E",
   },
 ];
 
 const ROADMAP = [
-  { month: "Jun", title: "Foundation", detail: "DSA + React depth", status: "done" as const },
-  { month: "Jul", title: "Projects", detail: "Ship Full Stack app", status: "done" as const },
-  { month: "Aug", title: "Apply", detail: "8 internship targets", status: "active" as const },
-  { month: "Sep", title: "Mocks", detail: "AI interview drills", status: "upcoming" as const },
-  { month: "Oct", title: "Offers", detail: "Negotiate & accept", status: "upcoming" as const },
+  { month: "Month 1", title: "Frontend Foundation", status: "done" as const, icon: Check },
+  { month: "Month 2", title: "Backend Development", status: "done" as const, icon: Check },
+  { month: "Month 3", title: "Database & APIs", status: "active" as const, icon: Database },
+  { month: "Month 4", title: "Projects", status: "upcoming" as const, icon: Lock },
+  { month: "Month 5–6", title: "Advanced + Placement", status: "upcoming" as const, icon: Flag },
 ];
 
 const TASKS = [
-  { label: "Finish System Design intro lesson", done: true },
-  { label: "Update resume projects section", done: false },
-  { label: "Apply to 2 Chennai internships", done: false },
-  { label: "30-min LeetCode warm-up", done: false },
+  { label: "React Basics – Components", mins: 45, done: true, icon: Code2, tone: "bg-blue-50 text-[#0F3DDE]" },
+  { label: "Finish System Design intro lesson", mins: 30, done: true, icon: Layout, tone: "bg-violet-50 text-violet-600" },
+  { label: "Update resume projects section", mins: 20, done: false, icon: BookOpen, tone: "bg-amber-50 text-amber-600" },
+  { label: "Apply to 2 Chennai internships", mins: 25, done: false, icon: Briefcase, tone: "bg-emerald-50 text-emerald-600" },
+  { label: "30-min LeetCode warm-up", mins: 30, done: false, icon: Target, tone: "bg-rose-50 text-rose-600" },
 ];
 
 const STUDY_SLICES = [
-  { label: "DSA", value: 35, color: "#0F3DDE" },
-  { label: "Projects", value: 28, color: "#22C55E" },
-  { label: "Aptitude", value: 22, color: "#38BDF8" },
-  { label: "English", value: 15, color: "#F59E0B" },
+  { label: "DSA", value: 40, color: "#0F3DDE" },
+  { label: "Backend", value: 25, color: "#8B5CF6" },
+  { label: "Frontend", value: 20, color: "#22C55E" },
+  { label: "DBMS", value: 15, color: "#F59E0B" },
 ];
 
 const AI_OPPS = [
-  { title: "Product Intern – Web", kind: "Internship", meta: "Freshworks · Bangalore", href: "/dashboard/student/internships", icon: Rocket },
-  { title: "Merit Scholarship 2026", kind: "Scholarship", meta: "Ellowring Trust · ₹50k", href: "/dashboard/student/colleges", icon: Award },
-  { title: "Jr Full Stack Developer", kind: "Job", meta: "Zoho · Chennai · 94% match", href: "/dashboard/student/jobs", icon: Briefcase },
-  { title: "VIT Vellore · CSE", kind: "College", meta: "NIRF top · Apply by Sep", href: "/dashboard/student/colleges", icon: Building2 },
+  {
+    title: "Product Intern – Web",
+    kind: "Internship",
+    meta: "Freshworks · Bangalore",
+    href: "/dashboard/student/internships",
+    icon: Rocket,
+    cta: "Apply Now",
+    btn: "bg-emerald-500 text-white",
+    chip: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    title: "Merit Scholarship 2026",
+    kind: "Scholarship",
+    meta: "Ellowring Trust · ₹50k",
+    href: "/dashboard/student/colleges",
+    icon: Award,
+    cta: "Explore",
+    btn: "bg-violet-500 text-white",
+    chip: "bg-violet-50 text-violet-700",
+  },
+  {
+    title: "Jr Full Stack Developer",
+    kind: "Job Opening",
+    meta: "Zoho · Chennai · 94% match",
+    href: "/dashboard/student/jobs",
+    icon: Briefcase,
+    cta: "Apply Now",
+    btn: "bg-orange-500 text-white",
+    chip: "bg-orange-50 text-orange-700",
+  },
+  {
+    title: "VIT Vellore · CSE",
+    kind: "College",
+    meta: "NIRF top · Apply by Sep",
+    href: "/dashboard/student/colleges",
+    icon: Building2,
+    cta: "Explore",
+    btn: "bg-[#0F3DDE] text-white",
+    chip: "bg-blue-50 text-[#0F3DDE]",
+  },
 ];
 
 const INSIGHTS = [
   {
-    title: "Your React depth is hire-ready",
-    body: "Match rate for Full Stack roles is 12 pts above batch average.",
-    icon: TrendingUp,
+    title: "JavaScript score improved +8 pts",
+    body: "Your React depth is hire-ready vs batch average.",
+    when: "2h ago",
+    icon: Star,
   },
   {
-    title: "Internship window peaking",
-    body: "43 new remote / Chennai listings opened this week — prioritize now.",
-    icon: Flame,
-  },
-  {
-    title: "Roadmap tip",
-    body: "Add one IEEE / client project to unlock senior internship filters.",
-    icon: Lightbulb,
-  },
-  {
-    title: "Salary trajectory",
-    body: "Projected ₹12.5 LPA mid-band after 18 months Full Stack track.",
+    title: "Internship readiness at 78%",
+    body: "43 new remote / Chennai listings opened this week.",
+    when: "5h ago",
     icon: Target,
+  },
+  {
+    title: "Add System Design this week",
+    body: "Unlocks senior internship filters on your roadmap.",
+    when: "1d ago",
+    icon: BookOpen,
+  },
+  {
+    title: "Salary trajectory update",
+    body: "Projected ₹12.5 LPA mid-band after 18 months Full Stack.",
+    when: "2d ago",
+    icon: TrendingUp,
   },
 ];
 
-const QUICK_CHIPS = ["Skill gap analysis", "Best internship plan", "Resume review", "Salary negotiation"];
+const QUICK_CHIPS = [
+  { label: "Best colleges for my score?", icon: Building2 },
+  { label: "Roadmap to become Full Stack Developer", icon: Compass },
+  { label: "TNPSC Group 2 6-month plan", icon: BookOpen },
+  { label: "Scholarship for me?", icon: Award },
+];
 
 function MiniSpark({ values, color }: { values: number[]; color: string }) {
   const max = Math.max(...values);
@@ -168,6 +224,7 @@ export default function CareerPage() {
   const [prompt, setPrompt] = useState("");
   const [aiMode, setAiMode] = useState(true);
   const [taskState, setTaskState] = useState(TASKS);
+  const [liked, setLiked] = useState<string[]>([]);
 
   const doneCount = useMemo(() => taskState.filter((t) => t.done).length, [taskState]);
 
@@ -189,61 +246,53 @@ export default function CareerPage() {
       <CollagePage>
         <CollageTitle
           title="AI Career Copilot"
-          subtitle={`Personalized playbook for ${firstName} · Full Stack Developer`}
+          subtitle="Your personal AI guide for learning, career & life decisions."
           icon={Compass}
           action={
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setAiMode((v) => !v)}
+            <button
+              type="button"
+              onClick={() => setAiMode((v) => !v)}
+              className={clsx(
+                "inline-flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold ring-1 transition",
+                aiMode ? "bg-white text-[#0B1F3A] ring-slate-200 shadow-sm" : "bg-slate-100 text-slate-500 ring-slate-200",
+              )}
+            >
+              <span
                 className={clsx(
-                  "inline-flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold ring-1 transition",
-                  aiMode
-                    ? "bg-[#0F3DDE] text-white ring-[#0F3DDE]"
-                    : "bg-white text-slate-600 ring-slate-200",
+                  "relative h-4 w-7 rounded-full p-0.5 transition",
+                  aiMode ? "bg-emerald-500" : "bg-slate-300",
                 )}
               >
                 <span
                   className={clsx(
-                    "h-4 w-7 rounded-full p-0.5 transition",
-                    aiMode ? "bg-white/30" : "bg-slate-200",
+                    "block h-3 w-3 rounded-full bg-white shadow transition",
+                    aiMode ? "translate-x-3" : "translate-x-0",
                   )}
-                >
-                  <span
-                    className={clsx(
-                      "block h-3 w-3 rounded-full bg-white transition",
-                      aiMode ? "translate-x-3" : "translate-x-0",
-                    )}
-                  />
-                </span>
-                AI Mode
-              </button>
-              <AiAssistantChip />
-            </div>
+                />
+              </span>
+              AI Mode
+            </button>
           }
         />
 
         <BlueHero>
-          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0 flex-1">
-              <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
-                <Bot size={28} />
-              </div>
-              <h2 className="font-display text-xl font-extrabold lg:text-2xl">Hi {firstName} 👋</h2>
+          <div className="relative z-10 grid gap-5 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+            <div className="min-w-0">
+              <h2 className="font-display text-xl font-extrabold lg:text-2xl">Hi, {firstName}! 👋</h2>
               <p className="mt-1 max-w-xl text-[13px] text-blue-100">
-                I&apos;m your AI Career Copilot — ask about roles, skills, colleges, or interview prep.
+                I&apos;m your AI Career Copilot. Ask me anything.
               </p>
               <form onSubmit={onAsk} className="relative mt-4 max-w-2xl">
                 <input
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Type your question…"
-                  className="w-full rounded-full border border-white/25 bg-white/15 py-3 pl-4 pr-[6.5rem] text-[13px] text-white outline-none placeholder:text-white/60 focus:bg-white/20"
+                  placeholder="Type your question..."
+                  className="w-full rounded-full border-0 bg-white py-3.5 pl-4 pr-[6.5rem] text-[13px] font-medium text-[#0B1F3A] outline-none placeholder:text-slate-400 shadow-lg"
                 />
                 <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
                   <button
                     type="button"
-                    className="rounded-full p-2 text-white/80 hover:bg-white/10"
+                    className="rounded-full p-2 text-slate-400 hover:bg-slate-100"
                     onClick={() => window.alert("Voice input (demo).")}
                     aria-label="Voice"
                   >
@@ -251,79 +300,105 @@ export default function CareerPage() {
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-[12px] font-bold text-[#0F3DDE]"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#0F3DDE] text-white"
+                    aria-label="Send"
                   >
-                    <Send size={13} />
+                    <Send size={14} />
                   </button>
                 </div>
               </form>
               <div className="mt-3 flex flex-wrap gap-2">
-                {QUICK_CHIPS.map((chip) => (
-                  <button
-                    key={chip}
-                    type="button"
-                    onClick={() => setPrompt(chip)}
-                    className="rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white ring-1 ring-white/25"
-                  >
-                    {chip}
-                  </button>
-                ))}
+                {QUICK_CHIPS.map((chip) => {
+                  const Icon = chip.icon;
+                  return (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onClick={() => setPrompt(chip.label)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white ring-1 ring-white/25"
+                    >
+                      <Icon size={12} />
+                      {chip.label}
+                    </button>
+                  );
+                })}
               </div>
+            </div>
+            <div className="hidden flex-col items-center justify-center lg:flex">
+              <div className="flex h-36 w-36 items-center justify-center rounded-full bg-gradient-to-b from-white/25 to-white/5 ring-4 ring-sky-300/25">
+                <Bot size={72} className="text-white drop-shadow-lg" />
+              </div>
+              <p className="mt-3 text-[12px] font-semibold text-blue-50">AI Copilot Online</p>
             </div>
           </div>
         </BlueHero>
 
-        <WhiteCard title="AI Smart Dashboard">
+        <WhiteCard
+          title="AI Smart Dashboard"
+          action={
+            <Link href="/dashboard/student/career" className="text-[12px] font-bold text-[#0F3DDE]">
+              View Full Report →
+            </Link>
+          }
+        >
           <div className="grid gap-3 sm:grid-cols-3">
             {METRICS.map((m) => (
-              <div
-                key={m.label}
-                className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100"
-              >
+              <div key={m.label} className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
                 <p className="text-[11px] font-semibold text-slate-500">{m.label}</p>
                 <p className="mt-1 font-display text-2xl font-extrabold text-[#0B1F3A]">{m.value}</p>
+                <p className="mt-0.5 text-[11px] font-bold text-emerald-600">{m.hint}</p>
                 <MiniSpark values={m.spark} color={m.color} />
               </div>
             ))}
           </div>
         </WhiteCard>
 
-        <WhiteCard title="Personalized Roadmap">
+        <WhiteCard
+          title="AI Personalized Roadmap"
+          action={
+            <Link href="/dashboard/student/learn" className="text-[12px] font-bold text-[#0F3DDE]">
+              View Full Roadmap →
+            </Link>
+          }
+        >
+          <p className="mb-3 text-[13px] font-extrabold text-[#0B1F3A]">Full Stack Developer Roadmap (6 Months)</p>
           <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {ROADMAP.map((step, i) => (
-              <div key={step.month} className="flex min-w-0 flex-1 items-center gap-2">
-                <div
-                  className={clsx(
-                    "flex min-w-[108px] flex-col items-center rounded-2xl px-3 py-3.5 text-center",
-                    step.status === "done" && "bg-emerald-50 ring-1 ring-emerald-100",
-                    step.status === "active" && "bg-[#EFF6FF] ring-1 ring-[#BFDBFE]",
-                    step.status === "upcoming" && "bg-slate-50",
-                  )}
-                >
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{step.month}</p>
-                  <p className="mt-1 text-[13px] font-extrabold text-[#0B1F3A]">{step.title}</p>
-                  <p className="mt-0.5 text-[10px] text-slate-500">{step.detail}</p>
-                  <span
+            {ROADMAP.map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.month} className="flex min-w-0 flex-1 items-center gap-2">
+                  <div
                     className={clsx(
-                      "mt-2 rounded-full px-2 py-0.5 text-[9px] font-bold",
-                      step.status === "done" && "bg-emerald-100 text-emerald-700",
-                      step.status === "active" && "bg-[#0F3DDE] text-white",
-                      step.status === "upcoming" && "bg-slate-200 text-slate-500",
+                      "flex min-w-[120px] flex-col items-center rounded-2xl px-3 py-3.5 text-center",
+                      step.status === "done" && "bg-emerald-50 ring-1 ring-emerald-100",
+                      step.status === "active" && "bg-[#EFF6FF] ring-1 ring-[#BFDBFE]",
+                      step.status === "upcoming" && "bg-slate-50 ring-1 ring-slate-100",
                     )}
                   >
-                    {step.status === "done" ? "Done" : step.status === "active" ? "Now" : "Next"}
-                  </span>
+                    <span
+                      className={clsx(
+                        "mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full",
+                        step.status === "done" && "bg-emerald-500 text-white",
+                        step.status === "active" && "bg-[#0F3DDE] text-white",
+                        step.status === "upcoming" && "bg-slate-200 text-slate-500",
+                      )}
+                    >
+                      <Icon size={14} />
+                    </span>
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{step.month}</p>
+                    <p className="mt-1 text-[12px] font-extrabold leading-snug text-[#0B1F3A]">{step.title}</p>
+                  </div>
+                  {i < ROADMAP.length - 1 ? (
+                    <span
+                      className={clsx(
+                        "hidden h-0.5 w-3 shrink-0 sm:block",
+                        step.status === "done" ? "bg-emerald-300" : "bg-slate-200",
+                      )}
+                    />
+                  ) : null}
                 </div>
-                {i < ROADMAP.length - 1 ? (
-                  <span
-                    className={clsx(
-                      "hidden h-0.5 w-3 shrink-0 sm:block",
-                      step.status === "done" ? "bg-emerald-300" : "bg-slate-200",
-                    )}
-                  />
-                ) : null}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </WhiteCard>
 
@@ -337,40 +412,47 @@ export default function CareerPage() {
             }
           >
             <ul className="space-y-2.5">
-              {taskState.map((t, i) => (
-                <li key={t.label}>
-                  <button
-                    type="button"
-                    onClick={() => toggleTask(i)}
-                    className="flex w-full items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 text-left ring-1 ring-slate-100"
-                  >
-                    {t.done ? (
-                      <CheckCircle2 size={18} className="shrink-0 text-emerald-500" />
-                    ) : (
-                      <Circle size={18} className="shrink-0 text-slate-300" />
-                    )}
-                    <span
-                      className={clsx(
-                        "text-[13px]",
-                        t.done ? "font-medium text-slate-400 line-through" : "font-bold text-[#0B1F3A]",
-                      )}
+              {taskState.map((t, i) => {
+                const Icon = t.icon;
+                return (
+                  <li key={t.label}>
+                    <button
+                      type="button"
+                      onClick={() => toggleTask(i)}
+                      className="flex w-full items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 text-left ring-1 ring-slate-100"
                     >
-                      {t.label}
-                    </span>
-                  </button>
-                </li>
-              ))}
+                      <SoftIcon icon={Icon} className={t.tone} />
+                      <div className="min-w-0 flex-1">
+                        <span
+                          className={clsx(
+                            "block text-[13px]",
+                            t.done ? "font-medium text-slate-400 line-through" : "font-bold text-[#0B1F3A]",
+                          )}
+                        >
+                          {t.label}
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-400">{t.mins} min</span>
+                      </div>
+                      {t.done ? (
+                        <CheckCircle2 size={18} className="shrink-0 text-emerald-500" />
+                      ) : (
+                        <Circle size={18} className="shrink-0 text-slate-300" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </WhiteCard>
 
-          <WhiteCard title="Study Focus">
+          <WhiteCard title="AI Study Focus">
             <StudyDonut />
             <div className="mt-4 flex flex-wrap gap-2">
               <PillButton href="/dashboard/student/learn" tone="outline" className="!text-[11px]">
                 <BookOpen size={13} /> Learn hub
               </PillButton>
               <PillButton href="/dashboard/student/mock-tests" className="!text-[11px]">
-                <GraduationCap size={13} /> Mock tests
+                <Server size={13} /> Practice focus
               </PillButton>
             </div>
           </WhiteCard>
@@ -380,7 +462,7 @@ export default function CareerPage() {
           title="Opportunities Recommended by AI"
           action={
             <Link href="/dashboard/student/opportunities" className="text-[12px] font-bold text-[#0F3DDE]">
-              View all
+              View All →
             </Link>
           }
         >
@@ -388,27 +470,58 @@ export default function CareerPage() {
             {AI_OPPS.map((o) => (
               <article
                 key={o.title}
-                className="min-w-[200px] max-w-[220px] rounded-2xl bg-slate-50 p-3.5 ring-1 ring-slate-100"
+                className="relative min-w-[210px] max-w-[230px] rounded-2xl bg-slate-50 p-3.5 ring-1 ring-slate-100"
               >
+                <button
+                  type="button"
+                  aria-label="Save"
+                  onClick={() =>
+                    setLiked((prev) => (prev.includes(o.title) ? prev.filter((t) => t !== o.title) : [...prev, o.title]))
+                  }
+                  className="absolute right-3 top-3 rounded-full bg-white p-1.5 text-slate-400 ring-1 ring-slate-100"
+                >
+                  <Heart size={13} className={liked.includes(o.title) ? "fill-rose-500 text-rose-500" : ""} />
+                </button>
                 <SoftIcon icon={o.icon} />
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-[#0F3DDE]">{o.kind}</p>
-                <h3 className="mt-0.5 text-[13px] font-extrabold leading-snug text-[#0B1F3A]">{o.title}</h3>
+                <p className={clsx("mt-2 inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", o.chip)}>
+                  {o.kind}
+                </p>
+                <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[#0B1F3A]">{o.title}</h3>
                 <p className="mt-1 text-[11px] text-slate-500">{o.meta}</p>
-                <PillButton href={o.href} className="mt-3 w-full !py-2 !text-[11px]">
-                  Open
-                </PillButton>
+                <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                  <MapPin size={10} /> Near You
+                </p>
+                <Link
+                  href={o.href}
+                  className={clsx(
+                    "mt-3 inline-flex w-full items-center justify-center rounded-full px-3 py-2 text-[11px] font-bold",
+                    o.btn,
+                  )}
+                >
+                  {o.cta}
+                </Link>
               </article>
             ))}
           </div>
         </WhiteCard>
 
-        <WhiteCard title="Recent AI Insights">
+        <WhiteCard
+          title="Recent AI Insights"
+          action={
+            <button type="button" className="text-[12px] font-bold text-[#0F3DDE]" onClick={() => window.alert("All insights…")}>
+              View All →
+            </button>
+          }
+        >
           <ul className="space-y-2.5">
             {INSIGHTS.map((ins) => (
               <li key={ins.title} className="flex gap-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-100">
                 <SoftIcon icon={ins.icon} className="bg-[#EFF6FF] text-[#0F3DDE]" />
-                <div className="min-w-0">
-                  <p className="text-[13px] font-extrabold text-[#0B1F3A]">{ins.title}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-[13px] font-extrabold text-[#0B1F3A]">{ins.title}</p>
+                    <span className="shrink-0 text-[10px] font-semibold text-slate-400">{ins.when}</span>
+                  </div>
                   <p className="mt-0.5 text-[11px] text-slate-500">{ins.body}</p>
                 </div>
               </li>
@@ -422,7 +535,7 @@ export default function CareerPage() {
           </p>
         ) : (
           <div className="flex items-center justify-center gap-2 text-[12px] font-semibold text-[#0F3DDE]">
-            <Sparkles size={14} /> Live AI guidance enabled
+            <Sparkles size={14} /> <Flame size={14} /> Live AI guidance enabled
           </div>
         )}
       </CollagePage>

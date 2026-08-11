@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Building2, Eye, EyeOff, Lock, Mail, MapPin, User } from "lucide-react";
 import { dashboardPath, Role, useAuth } from "@/lib/auth-context";
-import { AuthSplitShell, authUnderlineInput } from "@/components/auth-split-shell";
+import {
+  AuthCardShell,
+  authCardInput,
+  authCardPrimaryBtn,
+} from "@/components/auth-card-shell";
 
 const roles: { value: Role; label: string }[] = [
   { value: "STUDENT", label: "Student" },
@@ -48,82 +52,90 @@ export default function RegisterPage() {
     }
   }
 
-  if (authLoading) {
+  if (authLoading || user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
-        Loading…
-      </div>
-    );
-  }
-
-  if (user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
-        Opening your workspace…
+      <div className="flex min-h-screen items-center justify-center bg-[#E8F1FF] text-[#0F3DDE]">
+        {user ? "Opening your workspace…" : "Loading…"}
       </div>
     );
   }
 
   return (
-    <AuthSplitShell>
-      <h1 className="font-display text-[34px] font-bold tracking-tight text-[#1E293B] sm:text-[40px]">
-        Create account
-      </h1>
-      <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-slate-400">
-        Join Ellowring as a student or institution partner.
-      </p>
+    <AuthCardShell>
+      <div className="text-center">
+        <h1 className="font-display text-[28px] font-extrabold tracking-tight text-[#0B1F3A] sm:text-[30px]">
+          Create Account
+        </h1>
+        <p className="mt-1.5 text-[13px] text-slate-500 sm:text-[14px]">
+          Join Ellowring as a student or institution partner.
+        </p>
+      </div>
 
-      <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <label className="block">
-          <span className="text-[13px] font-bold text-[#1E293B]">Full name</span>
+      <form onSubmit={onSubmit} className="mt-6 space-y-3.5">
+        <label className="relative block">
+          <span className="sr-only">Full name</span>
+          <User
+            size={18}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          />
           <input
-            className={authUnderlineInput}
-            placeholder="Your name"
+            className={authCardInput}
+            placeholder="Full name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
           />
         </label>
 
-        <label className="block">
-          <span className="text-[13px] font-bold text-[#1E293B]">Email</span>
+        <label className="relative block">
+          <span className="sr-only">Email</span>
+          <Mail
+            size={18}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          />
           <input
-            className={authUnderlineInput}
+            className={authCardInput}
             type="email"
-            placeholder="you@example.com"
+            placeholder="Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
           />
         </label>
 
-        <label className="block">
-          <span className="text-[13px] font-bold text-[#1E293B]">Password</span>
-          <div className="relative mt-2">
-            <input
-              className="w-full border-0 border-b border-slate-200 bg-transparent py-2.5 pr-10 text-[15px] text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-[#2563EB]"
-              type={showPassword ? "text" : "password"}
-              placeholder="Min 6 characters"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              minLength={6}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-slate-400 transition hover:text-slate-600"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+        <label className="relative block">
+          <span className="sr-only">Password</span>
+          <Lock
+            size={18}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+          <input
+            className={`${authCardInput} pr-11`}
+            type={showPassword ? "text" : "password"}
+            placeholder="Password (min 6)"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+            minLength={6}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 transition hover:text-slate-600"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
         </label>
 
-        <label className="block">
-          <span className="text-[13px] font-bold text-[#1E293B]">Role</span>
+        <label className="relative block">
+          <span className="sr-only">Role</span>
+          <Building2
+            size={18}
+            className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
+          />
           <select
-            className={`${authUnderlineInput} appearance-none`}
+            className={`${authCardInput} appearance-none`}
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
           >
@@ -135,10 +147,14 @@ export default function RegisterPage() {
           </select>
         </label>
 
-        <label className="block">
-          <span className="text-[13px] font-bold text-[#1E293B]">City</span>
+        <label className="relative block">
+          <span className="sr-only">City</span>
+          <MapPin
+            size={18}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          />
           <input
-            className={authUnderlineInput}
+            className={authCardInput}
             placeholder="City"
             value={form.city}
             onChange={(e) => setForm({ ...form, city: e.target.value })}
@@ -146,10 +162,14 @@ export default function RegisterPage() {
         </label>
 
         {form.role !== "STUDENT" && (
-          <label className="block">
-            <span className="text-[13px] font-bold text-[#1E293B]">Organization</span>
+          <label className="relative block">
+            <span className="sr-only">Organization</span>
+            <Building2
+              size={18}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <input
-              className={authUnderlineInput}
+              className={authCardInput}
               placeholder="Organization name"
               value={form.orgName}
               onChange={(e) => setForm({ ...form, orgName: e.target.value })}
@@ -158,28 +178,22 @@ export default function RegisterPage() {
         )}
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">
+          <p className="rounded-xl bg-red-50 px-3 py-2 text-center text-sm text-red-600 ring-1 ring-red-100">
             {error}
           </p>
         )}
 
-        <div className="flex justify-end pt-1">
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-xl bg-[#2563EB] px-8 py-3 text-[14px] font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 disabled:opacity-60"
-          >
-            {loading ? "Creating…" : "Create account"}
-          </button>
-        </div>
+        <button type="submit" disabled={loading} className={authCardPrimaryBtn}>
+          {loading ? "Creating…" : "Create Account"}
+        </button>
       </form>
 
-      <p className="mt-8 text-[13px] text-slate-400">
+      <p className="mt-5 text-center text-[13px] text-slate-500">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-[#2563EB] hover:underline">
+        <Link href="/login" className="font-bold text-[#0F3DDE] hover:underline">
           Sign in
         </Link>
       </p>
-    </AuthSplitShell>
+    </AuthCardShell>
   );
 }

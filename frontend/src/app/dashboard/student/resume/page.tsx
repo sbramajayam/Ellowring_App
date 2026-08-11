@@ -5,11 +5,13 @@ import {
   Award,
   Briefcase,
   Download,
+  Eye,
   FileText,
   FolderKanban,
   GraduationCap,
   Link2,
   Loader2,
+  MapPin,
   Save,
   Send,
   Share2,
@@ -26,6 +28,7 @@ import {
   CollageTitle,
   PillButton,
   ProgressBar,
+  ScoreRing,
   SoftIcon,
   WhiteCard,
 } from "@/components/student-home/collage-ui";
@@ -92,24 +95,33 @@ function newId() {
 
 const SUGGESTIONS = [
   {
+    title: "Add measurable project outcomes",
+    body: "Quantify impact (users served, latency cut, conversion lift) on your top 2 projects.",
+  },
+  {
+    title: "Improve technical keywords",
+    body: "Surface React, TypeScript, Node.js, and REST APIs in the first skills line for ATS.",
+  },
+  {
+    title: "Rewrite summary for ATS",
+    body: "Lead with role + stack + internship proof in one crisp sentence recruiters scan.",
+  },
+  {
     title: "Quantify internship impact",
     body: "Add metrics (e.g. reduced load time by 30%) under your latest internship.",
   },
   {
-    title: "Rewrite summary for ATS",
-    body: "Lead with role + years + 2–3 keywords recruiters scan for.",
-  },
-  {
-    title: "Promote React & TypeScript",
-    body: "Move front-end stack into the first line of Skills for stronger keyword match.",
+    title: "Tighten project descriptions",
+    body: "Keep each bullet under 18 words and start with a strong action verb.",
   },
 ];
 
 const SKILL_GAPS = [
-  { label: "System Design", value: 45, color: "bg-amber-400" },
-  { label: "DSA / Problem Solving", value: 62, color: "bg-[#0F3DDE]" },
-  { label: "Cloud (AWS/GCP)", value: 38, color: "bg-rose-400" },
-  { label: "Communication", value: 78, color: "bg-emerald-500" },
+  { label: "JavaScript", value: 88, level: "Advanced", color: "bg-emerald-500" },
+  { label: "React", value: 84, level: "Advanced", color: "bg-emerald-500" },
+  { label: "Node.js", value: 62, level: "Intermediate", color: "bg-[#0F3DDE]" },
+  { label: "SQL", value: 48, level: "Beginner", color: "bg-amber-400" },
+  { label: "System Design", value: 35, level: "Beginner", color: "bg-rose-400" },
 ];
 
 const TEMPLATES = [
@@ -118,13 +130,13 @@ const TEMPLATES = [
   { id: "startup", name: "Startup Creative", desc: "Bold headers, project-first", tone: "from-[#0369A1] to-[#22C55E]" },
 ];
 
-const QUICK_EDITS: { id: NonNullable<EditSection>; label: string; icon: typeof UserRound; hint: string }[] = [
-  { id: "personal", label: "Personal Info", icon: UserRound, hint: "Name, email, phone" },
-  { id: "education", label: "Education", icon: GraduationCap, hint: "Degrees & college" },
-  { id: "skills", label: "Skills", icon: Sparkles, hint: "Tech & soft skills" },
-  { id: "projects", label: "Projects", icon: FolderKanban, hint: "Portfolio highlights" },
-  { id: "internship", label: "Internship", icon: Briefcase, hint: "Work experience" },
-  { id: "certifications", label: "Certifications", icon: Award, hint: "Credentials" },
+const QUICK_EDITS: { id: NonNullable<EditSection>; label: string; icon: typeof UserRound; hint: string; tone: string }[] = [
+  { id: "personal", label: "Personal Info", icon: UserRound, hint: "Name, email, phone", tone: "bg-blue-50 text-[#0F3DDE]" },
+  { id: "education", label: "Education", icon: GraduationCap, hint: "Degrees & college", tone: "bg-emerald-50 text-emerald-600" },
+  { id: "skills", label: "Skills", icon: Sparkles, hint: "Tech & soft skills", tone: "bg-violet-50 text-violet-600" },
+  { id: "projects", label: "Projects", icon: FolderKanban, hint: "Portfolio highlights", tone: "bg-amber-50 text-amber-600" },
+  { id: "internship", label: "Ellowring Internship", icon: Briefcase, hint: "Work experience", tone: "bg-sky-50 text-sky-600" },
+  { id: "certifications", label: "Certifications", icon: Award, hint: "Credentials", tone: "bg-rose-50 text-rose-600" },
 ];
 
 export default function ResumePage() {
@@ -159,15 +171,15 @@ export default function ResumePage() {
     } else {
       setForm({
         ...emptyForm,
-        fullName: user?.name || "Alex Kumar",
-        email: user?.email || "alex@ellowring.com",
+        fullName: user?.name || "Vignesh",
+        email: user?.email || "vignesh@ellowring.com",
         phone: "+91 98765 43210",
         summary:
-          "Computer Science undergraduate seeking software internships. Strong in React, TypeScript, and collaborative product delivery.",
+          "Full Stack Developer undergraduate seeking software internships. Strong in React, TypeScript, and collaborative product delivery.",
         skills: "React, TypeScript, Node.js, SQL, Git",
         education: "B.Tech CSE · Sri Venkateswara College · 2022–2026 · CGPA 8.4",
         experience: "Frontend Intern · Zoho · Jun–Aug 2025\n• Built dashboard widgets used by 2k users",
-        projects: "Campus Connect — MERN job board for colleges",
+        projects: "Campus Connect — MERN job board for colleges\nEllowring Tracker — attendance + analytics PWA",
         certifications: "AWS Cloud Practitioner",
       });
     }
@@ -202,16 +214,23 @@ export default function ResumePage() {
 
   function applyAiFix(title: string) {
     setAppliedFixes((prev) => (prev.includes(title) ? prev : [...prev, title]));
-    if (title.includes("summary")) {
+    if (title.toLowerCase().includes("summary") || title.toLowerCase().includes("ats")) {
       setForm((f) => ({
         ...f,
         summary:
           "Software engineering student (React/TypeScript) with internship experience shipping UI used by 2k+ users. Seeking roles in product engineering.",
       }));
-    } else if (title.includes("React")) {
+    } else if (title.toLowerCase().includes("keyword") || title.toLowerCase().includes("technical")) {
       setForm((f) => ({
         ...f,
-        skills: "React, TypeScript, " + f.skills.replace(/React,?\s*|TypeScript,?\s*/gi, ""),
+        skills: "React, TypeScript, Node.js, REST APIs, " + f.skills.replace(/React,?\s*|TypeScript,?\s*|Node\.js,?\s*/gi, ""),
+      }));
+    } else if (title.toLowerCase().includes("project")) {
+      setForm((f) => ({
+        ...f,
+        projects: f.projects.includes("2k+")
+          ? f.projects
+          : f.projects + "\n• Served 2k+ campus users; cut query latency 35%",
       }));
     } else {
       setForm((f) => ({
@@ -239,7 +258,7 @@ export default function ResumePage() {
       <CollagePage>
         <CollageTitle
           title="AI Resume Builder"
-          subtitle="ATS-ready resume with AI score, skill gaps, and quick edits."
+          subtitle="Create a recruiter-ready resume in minutes."
           icon={FileText}
           action={<AiAssistantChip />}
         />
@@ -251,51 +270,82 @@ export default function ResumePage() {
         ) : null}
 
         <BlueHero>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-[12px] font-semibold text-blue-100">Resume Score</p>
-              <p className="mt-1 font-display text-4xl font-extrabold tracking-tight">
-                82<span className="text-xl font-bold text-blue-100">/100</span>
-              </p>
-              <p className="mt-1 text-[14px] font-bold text-emerald-300">Great Job!</p>
+          <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-4">
+              <ScoreRing value={82} size={108} tone="mixed" onDark label="Score" />
+              <div>
+                <p className="text-[12px] font-semibold text-blue-100">Resume Score</p>
+                <p className="mt-0.5 font-display text-3xl font-extrabold tracking-tight">82/100</p>
+                <p className="mt-1 text-[14px] font-bold text-emerald-300">Great Job!</p>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[
-                { label: "ATS", value: "91%" },
-                { label: "Profile", value: "88%" },
-                { label: "Recruiter", value: "Strong" },
-                { label: "AI", value: "Optimized" },
-              ].map((s) => (
-                <div key={s.label} className="min-w-[88px] rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15">
-                  <p className="text-[10px] font-semibold text-blue-100">{s.label}</p>
-                  <p className="mt-0.5 text-[15px] font-extrabold">{s.value}</p>
-                </div>
-              ))}
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+              <div className="flex flex-col items-center text-center">
+                <ScoreRing value={91} size={72} tone="green" onDark percent label="ATS" />
+                <p className="mt-1 text-[10px] font-semibold text-blue-100">Compatibility</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <ScoreRing value={88} size={72} tone="blue" onDark percent label="Profile" />
+                <p className="mt-1 text-[10px] font-semibold text-blue-100">Completion</p>
+              </div>
+              <div className="flex min-w-[96px] flex-col items-center rounded-2xl bg-white/10 px-3 py-3 text-center ring-1 ring-white/15">
+                <SoftIcon icon={Award} className="bg-white/15 text-white" />
+                <p className="mt-2 text-[12px] font-extrabold">Strong</p>
+                <p className="text-[10px] font-semibold text-blue-100">Recruiter Readiness</p>
+              </div>
+              <div className="flex min-w-[96px] flex-col items-center rounded-2xl bg-white/10 px-3 py-3 text-center ring-1 ring-white/15">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#0F3DDE] text-[11px] font-extrabold">
+                  AI
+                </span>
+                <p className="mt-2 rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold text-emerald-200 ring-1 ring-emerald-300/30">
+                  AI Optimized
+                </p>
+              </div>
             </div>
           </div>
         </BlueHero>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <WhiteCard title="Resume Preview" action={<span className="text-[11px] font-bold text-[#0F3DDE]">{TEMPLATES.find((t) => t.id === template)?.name}</span>}>
-            <div className="min-h-[280px] rounded-xl border border-slate-100 bg-[#FAFBFC] p-5">
-              <h3 className="font-display text-xl font-extrabold text-[#0B1F3A]">{form.fullName || "Your Name"}</h3>
-              <p className="mt-1 text-[12px] text-[#0F3DDE]">
-                {[form.email, form.phone].filter(Boolean).join(" · ") || "email@example.com"}
-              </p>
-              {form.summary ? <p className="mt-3 text-[13px] leading-relaxed text-slate-600">{form.summary}</p> : null}
-              {skillTags.length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {skillTags.map((s) => (
-                    <span key={s} className="rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-[#0F3DDE]">
-                      {s}
+          <WhiteCard
+            title="Resume Preview"
+            action={
+              <PillButton tone="outline" className="!py-1.5 !text-[11px]" onClick={() => window.alert("Opening PDF preview…")}>
+                <Eye size={13} /> Preview PDF
+              </PillButton>
+            }
+          >
+            <div className="min-h-[300px] rounded-xl border border-slate-100 bg-[#FAFBFC] p-5">
+              <div className="flex gap-3">
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0F3DDE] font-display text-lg font-extrabold text-white">
+                  {(form.fullName || "V").charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-display text-xl font-extrabold uppercase tracking-tight text-[#0B1F3A]">
+                    {form.fullName || "Your Name"}
+                  </h3>
+                  <p className="text-[12px] font-bold text-[#0F3DDE]">Full Stack Developer</p>
+                  <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500">
+                    <span>{form.email || "email@example.com"}</span>
+                    <span>·</span>
+                    <span>{form.phone || "+91 …"}</span>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <MapPin size={10} /> Chennai
                     </span>
-                  ))}
+                  </p>
                 </div>
-              ) : null}
-              {form.experience ? (
+              </div>
+              {form.summary ? <p className="mt-4 text-[13px] leading-relaxed text-slate-600">{form.summary}</p> : null}
+              {skillTags.length > 0 ? (
                 <div className="mt-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Experience</p>
-                  <pre className="mt-1 whitespace-pre-wrap font-sans text-[12px] leading-relaxed text-slate-600">{form.experience}</pre>
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Skills</p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {skillTags.map((s) => (
+                      <span key={s} className="rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-[#0F3DDE]">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               ) : null}
               {form.education ? (
@@ -304,17 +354,25 @@ export default function ResumePage() {
                   <pre className="mt-1 whitespace-pre-wrap font-sans text-[12px] text-slate-600">{form.education}</pre>
                 </div>
               ) : null}
+              {form.projects ? (
+                <div className="mt-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Projects</p>
+                  <pre className="mt-1 whitespace-pre-wrap font-sans text-[12px] leading-relaxed text-slate-600">{form.projects}</pre>
+                </div>
+              ) : null}
+              {form.experience ? (
+                <div className="mt-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Internship</p>
+                  <pre className="mt-1 whitespace-pre-wrap font-sans text-[12px] leading-relaxed text-slate-600">{form.experience}</pre>
+                </div>
+              ) : null}
             </div>
-            <button
-              type="button"
-              onClick={() => setEditSection("personal")}
-              className="mt-3 w-full rounded-full bg-slate-50 py-2.5 text-[12px] font-bold text-[#0F3DDE] ring-1 ring-slate-200"
-            >
-              Open Quick Edit
-            </button>
           </WhiteCard>
 
-          <WhiteCard title="AI Improvement Suggestions">
+          <WhiteCard
+            title="AI Improvement Suggestions"
+            action={<Sparkles size={15} className="text-[#0F3DDE]" />}
+          >
             <ul className="space-y-3">
               {SUGGESTIONS.map((s) => (
                 <li key={s.title} className="rounded-2xl bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100">
@@ -325,98 +383,128 @@ export default function ResumePage() {
                     </div>
                     <SoftIcon icon={Sparkles} className="bg-[#EFF6FF] text-[#0F3DDE]" />
                   </div>
-                  <PillButton
-                    className="mt-3 w-full sm:w-auto"
-                    onClick={() => applyAiFix(s.title)}
-                  >
+                  <PillButton className="mt-3 w-full sm:w-auto" onClick={() => applyAiFix(s.title)}>
                     {appliedFixes.includes(s.title) ? "Applied" : "Apply AI Fix"}
                   </PillButton>
                 </li>
               ))}
             </ul>
+            <button
+              type="button"
+              className="mt-3 w-full text-center text-[12px] font-bold text-[#0F3DDE]"
+              onClick={() => window.alert("More suggestions unlocked (demo).")}
+            >
+              View All Suggestions
+            </button>
           </WhiteCard>
         </div>
 
-        <WhiteCard title="Quick Edit">
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-            {QUICK_EDITS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setEditSection(item.id)}
-                  className="rounded-[16px] bg-[#F8FAFC] p-3 text-left ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:ring-[#BFDBFE]"
-                >
-                  <SoftIcon icon={Icon} />
-                  <p className="mt-2 text-[12px] font-extrabold text-[#0B1F3A]">{item.label}</p>
-                  <p className="mt-0.5 text-[10px] text-slate-500">{item.hint}</p>
-                </button>
-              );
-            })}
-          </div>
-        </WhiteCard>
-
-        <WhiteCard title="Templates">
-          <div className="grid gap-3 sm:grid-cols-3">
-            {TEMPLATES.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTemplate(t.id)}
-                className={clsx(
-                  "overflow-hidden rounded-[18px] text-left ring-2 transition",
-                  template === t.id ? "ring-[#0F3DDE]" : "ring-transparent",
-                )}
-              >
-                <div className={clsx("h-16 bg-gradient-to-br", t.tone)} />
-                <div className="bg-white p-3">
-                  <p className="text-[13px] font-extrabold text-[#0B1F3A]">{t.name}</p>
-                  <p className="text-[11px] text-slate-500">{t.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </WhiteCard>
-
         <div className="grid gap-4 lg:grid-cols-2">
-          <WhiteCard title="Skill Gap Analysis">
+          <WhiteCard title="Quick Edit">
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+              {QUICK_EDITS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setEditSection(item.id)}
+                    className="rounded-[16px] bg-[#F8FAFC] p-3 text-left ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:ring-[#BFDBFE]"
+                  >
+                    <SoftIcon icon={Icon} className={item.tone} />
+                    <p className="mt-2 text-[12px] font-extrabold text-[#0B1F3A]">{item.label}</p>
+                    <p className="mt-0.5 text-[10px] text-slate-500">{item.hint}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </WhiteCard>
+
+          <WhiteCard
+            title="AI Resume Templates"
+            action={
+              <button type="button" className="text-[12px] font-bold text-[#0F3DDE]" onClick={() => window.alert("Template gallery…")}>
+                View All
+              </button>
+            }
+          >
+            <div className="grid gap-3 sm:grid-cols-3">
+              {TEMPLATES.map((t) => (
+                <div
+                  key={t.id}
+                  className={clsx(
+                    "overflow-hidden rounded-[18px] text-left ring-2 transition",
+                    template === t.id ? "ring-[#0F3DDE]" : "ring-transparent",
+                  )}
+                >
+                  <button type="button" onClick={() => setTemplate(t.id)} className="block w-full text-left">
+                    <div className={clsx("h-16 bg-gradient-to-br", t.tone)} />
+                    <div className="bg-white p-3">
+                      <p className="text-[13px] font-extrabold text-[#0B1F3A]">{t.name}</p>
+                      <p className="text-[11px] text-slate-500">{t.desc}</p>
+                    </div>
+                  </button>
+                  <div className="bg-white px-3 pb-3">
+                    <PillButton
+                      tone={template === t.id ? "primary" : "outline"}
+                      className="w-full !py-1.5 !text-[11px]"
+                      onClick={() => {
+                        setTemplate(t.id);
+                        setMsg(`Template set: ${t.name}`);
+                      }}
+                    >
+                      Use Template
+                    </PillButton>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </WhiteCard>
+        </div>
+
+        <WhiteCard
+          title="AI Skill Gap Analysis"
+          action={<span className="rounded-full bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-bold text-[#0F3DDE]">Based on 50+ Job Descriptions</span>}
+        >
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <ul className="space-y-3">
               {SKILL_GAPS.map((g) => (
                 <li key={g.label}>
                   <div className="mb-1 flex items-center justify-between text-[12px]">
-                    <span className="font-bold text-slate-700">{g.label}</span>
+                    <span className="font-bold text-slate-700">
+                      {g.label}{" "}
+                      <span className="ml-1 text-[10px] font-semibold text-slate-400">{g.level}</span>
+                    </span>
                     <span className="font-extrabold text-[#0B1F3A]">{g.value}%</span>
                   </div>
                   <ProgressBar value={g.value} color={g.color} />
                 </li>
               ))}
             </ul>
-          </WhiteCard>
-          <WhiteCard title="AI Recommendation">
             <div className="rounded-2xl bg-gradient-to-br from-[#EFF6FF] to-white p-4 ring-1 ring-[#BFDBFE]">
               <p className="inline-flex items-center gap-1.5 text-[12px] font-bold text-[#0F3DDE]">
-                <Sparkles size={14} /> Personalized plan
+                <Sparkles size={14} /> AI Recommendation
               </p>
               <p className="mt-2 text-[13px] leading-relaxed text-slate-600">
-                Strengthen System Design and Cloud basics next. Pair practice with AI Interview Coach, then apply to 3 SDE internships matched to your resume keywords.
+                Learn SQL Joins and Backend APIs to increase your resume score to 92+. Pair practice with Interview Coach,
+                then apply to 3 SDE internships matched to your keywords.
               </p>
-              <PillButton href="/dashboard/student/ai-assistant" className="mt-4">
-                Improve with AI
+              <PillButton href="/dashboard/student/learn" className="mt-4">
+                View Learning Path
               </PillButton>
             </div>
-          </WhiteCard>
-        </div>
+          </div>
+        </WhiteCard>
 
         <div className="flex flex-wrap gap-2">
           <PillButton onClick={() => window.alert("PDF export will download shortly (demo).")}>
             <Download size={14} /> Download PDF
           </PillButton>
           <PillButton tone="outline" onClick={() => window.alert("Share sheet opened (demo).")}>
-            <Share2 size={14} /> Share
+            <Share2 size={14} /> Share Resume
           </PillButton>
           <PillButton tone="outline" onClick={() => window.alert("Public resume link copied (demo).")}>
-            <Link2 size={14} /> Create Link
+            <Link2 size={14} /> Create Resume Link
           </PillButton>
           <PillButton tone="dark" href="/dashboard/student/jobs">
             <Send size={14} /> Send to Ellowring Jobs

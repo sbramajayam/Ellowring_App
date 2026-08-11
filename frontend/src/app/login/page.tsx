@@ -8,7 +8,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#0B2A6B] text-blue-100">
+        <div className="flex min-h-screen items-center justify-center bg-[#E8F1FF] text-[#0F3DDE]">
           Loading…
         </div>
       }

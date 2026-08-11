@@ -89,6 +89,7 @@ export function ScoreRing({
   size = 88,
   tone = "blue",
   onDark = false,
+  percent = false,
 }: {
   value: number;
   max?: number;
@@ -97,6 +98,8 @@ export function ScoreRing({
   tone?: "blue" | "green" | "mixed";
   /** Use on BlueHero / navy surfaces so the track stays visible */
   onDark?: boolean;
+  /** Show value as e.g. 91% instead of 91/100 */
+  percent?: boolean;
 }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const r = (size - 12) / 2;
@@ -127,7 +130,11 @@ export function ScoreRing({
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <span className="font-display text-lg font-extrabold leading-none">
           {value}
-          <span className="text-[11px] font-bold opacity-80">/{max}</span>
+          {percent ? (
+            <span className="text-[12px] font-bold">%</span>
+          ) : (
+            <span className="text-[11px] font-bold opacity-80">/{max}</span>
+          )}
         </span>
         {label ? <span className="mt-0.5 text-[9px] font-semibold opacity-80">{label}</span> : null}
       </div>

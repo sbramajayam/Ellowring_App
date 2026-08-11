@@ -229,15 +229,19 @@ export function ProjectMarketplaceContent({
       <BlueHero>
         <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 flex-1">
-            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white ring-1 ring-white/25">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-100">
+              Ellowring Projects
+            </p>
+            <h2 className="mt-1 font-display text-xl font-extrabold lg:text-2xl">Project Marketplace</h2>
+            <div className="mb-3 mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white ring-1 ring-white/25">
               <Sparkles size={12} /> AI Recommended for Full Stack
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {[
                 { label: "Available", value: "1248" },
                 { label: "Live Client", value: "186" },
-                { label: "Students", value: "12540" },
-                { label: "Placement-Oriented", value: "420" },
+                { label: "Students", value: "12,540" },
+                { label: "Placement", value: "420" },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl bg-white/10 px-3 py-2.5 backdrop-blur-sm">
                   <p className="font-display text-xl font-extrabold tabular-nums lg:text-2xl">{s.value}</p>
@@ -275,37 +279,39 @@ export function ProjectMarketplaceContent({
         </div>
       </BlueHero>
 
-      <div className="flex justify-between gap-2 overflow-x-auto px-0.5 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:justify-around">
-        {CATEGORIES.map((c) => {
-          const Icon = c.icon;
-          const active = cat === c.id;
-          return (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setCat(c.id)}
-              className="flex w-[64px] shrink-0 flex-col items-center gap-1.5"
-            >
-              <span
-                className={clsx(
-                  "inline-flex h-14 w-14 items-center justify-center rounded-full shadow-[0_4px_14px_rgba(15,23,42,0.08)] ring-2 transition",
-                  active ? "bg-[#0F3DDE] text-white ring-[#93C5FD]" : `${c.tone} ring-white`,
-                )}
+      <WhiteCard title="Categories" className="!p-3 lg:!p-4">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6 sm:gap-2">
+          {CATEGORIES.map((c) => {
+            const Icon = c.icon;
+            const active = cat === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCat(c.id)}
+                className="flex flex-col items-center gap-1.5"
               >
-                <Icon size={22} />
-              </span>
-              <span
-                className={clsx(
-                  "text-[11px] font-bold",
-                  active ? "text-[#0F3DDE]" : "text-slate-600",
-                )}
-              >
-                {c.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <span
+                  className={clsx(
+                    "inline-flex h-14 w-14 items-center justify-center rounded-full shadow-[0_4px_14px_rgba(15,23,42,0.08)] ring-2 transition",
+                    active ? "bg-[#0F3DDE] text-white ring-[#93C5FD]" : `${c.tone} ring-white`,
+                  )}
+                >
+                  <Icon size={22} />
+                </span>
+                <span
+                  className={clsx(
+                    "text-[11px] font-bold",
+                    active ? "text-[#0F3DDE]" : "text-slate-600",
+                  )}
+                >
+                  {c.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </WhiteCard>
 
       {loading ? (
         <p className="inline-flex items-center gap-2 text-sm text-slate-500">
@@ -400,7 +406,7 @@ export function ProjectMarketplaceContent({
             </div>
           </WhiteCard>
 
-          <WhiteCard title="Project Progress Tracker">
+          <WhiteCard title="Progress Tracker">
             <div className="mb-2 flex items-center justify-between text-[12px]">
               <span className="font-bold text-[#0B1F3A]">Overall completion</span>
               <span className="font-extrabold text-[#0F3DDE]">68%</span>
@@ -425,24 +431,6 @@ export function ProjectMarketplaceContent({
               ))}
             </ul>
           </WhiteCard>
-
-          <WhiteCard title="Achievement & Portfolio">
-            <div className="grid grid-cols-3 gap-2">
-              {ACHIEVEMENTS.map((a) => (
-                <div
-                  key={a.label}
-                  className="rounded-2xl bg-[#F8FAFC] p-3 text-center ring-1 ring-slate-100"
-                >
-                  <SoftIcon icon={a.icon} className="mx-auto h-9 w-9 bg-[#EFF6FF] text-[#0F3DDE]" />
-                  <p className="mt-1.5 font-display text-lg font-extrabold text-[#0B1F3A]">{a.value}</p>
-                  <p className="text-[10px] font-semibold text-slate-500">{a.label}</p>
-                </div>
-              ))}
-            </div>
-            <PillButton href="/dashboard/student/resume" tone="outline" className="mt-3 w-full">
-              View portfolio on Resume
-            </PillButton>
-          </WhiteCard>
         </div>
 
         <div className="space-y-4">
@@ -454,15 +442,18 @@ export function ProjectMarketplaceContent({
                     <span className="font-bold text-[#0B1F3A]">{m.name}</span>
                     <span className="font-semibold text-slate-500">{m.value}%</span>
                   </div>
-                  <ProgressBar value={m.value} />
+                  <ProgressBar
+                    value={m.value}
+                    color={m.value >= 85 ? "bg-emerald-500" : "bg-[#0F3DDE]"}
+                  />
                 </div>
               ))}
             </div>
           </WhiteCard>
 
           <WhiteCard className="flex flex-col items-center text-center text-[#0B1F3A]">
-            <p className="mb-2 text-[13px] font-extrabold">AI Recommendation Score</p>
-            <ScoreRing value={94} max={100} label="Fit" size={110} tone="blue" />
+            <p className="mb-2 font-display text-[15px] font-extrabold">AI Recommendation Score</p>
+            <ScoreRing value={94} max={100} label="Fit" size={118} tone="blue" percent />
             <p className="mt-2 max-w-[220px] text-[12px] text-slate-500">
               Strong match for Full Stack + AI/ML client sprints this placement window.
             </p>
@@ -500,7 +491,7 @@ export function ProjectMarketplaceContent({
 
           <section className="overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0B1F3A] via-[#0F3DDE] to-[#2563EB] p-4 text-white shadow-[0_16px_36px_rgba(15,61,222,0.28)] lg:rounded-[22px] lg:p-5">
             <div className="mb-2 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-blue-100">
-              <Bot size={14} /> AI Project Mentor
+              <Bot size={14} /> Ask AI Mentor
             </div>
             <h3 className="font-display text-lg font-extrabold">Stuck on scope or stack?</h3>
             <p className="mt-1 text-[12px] text-blue-100">
@@ -510,24 +501,44 @@ export function ProjectMarketplaceContent({
               Ask AI Mentor
             </PillButton>
           </section>
-
-          <WhiteCard title="Why Build Projects">
-            <ul className="space-y-2">
-              {WHY_BUILD.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-[12px]">
-                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-[#0F3DDE]" />
-                  <span className="font-semibold text-[#0B1F3A]">{item}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/dashboard/student/career"
-              className="mt-3 inline-flex items-center gap-1 text-[12px] font-bold text-[#0F3DDE]"
-            >
-              <Briefcase size={13} /> See career impact
-            </Link>
-          </WhiteCard>
         </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WhiteCard title="Achievement & Portfolio">
+          <div className="grid grid-cols-3 gap-2">
+            {ACHIEVEMENTS.map((a) => (
+              <div
+                key={a.label}
+                className="rounded-2xl bg-[#F8FAFC] p-3 text-center ring-1 ring-slate-100"
+              >
+                <SoftIcon icon={a.icon} className="mx-auto h-9 w-9 bg-[#EFF6FF] text-[#0F3DDE]" />
+                <p className="mt-1.5 font-display text-lg font-extrabold text-[#0B1F3A]">{a.value}</p>
+                <p className="text-[10px] font-semibold text-slate-500">{a.label}</p>
+              </div>
+            ))}
+          </div>
+          <PillButton href="/dashboard/student/resume" tone="outline" className="mt-3 w-full">
+            View portfolio on Resume
+          </PillButton>
+        </WhiteCard>
+
+        <WhiteCard title="Why Build Projects">
+          <ul className="space-y-2">
+            {WHY_BUILD.map((item) => (
+              <li key={item} className="flex items-start gap-2.5 text-[12px]">
+                <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-[#0F3DDE]" />
+                <span className="font-semibold text-[#0B1F3A]">{item}</span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/dashboard/student/career"
+            className="mt-3 inline-flex items-center gap-1 text-[12px] font-bold text-[#0F3DDE]"
+          >
+            <Briefcase size={13} /> See career impact
+          </Link>
+        </WhiteCard>
       </div>
     </div>
   );

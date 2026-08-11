@@ -177,15 +177,15 @@ const UNIVERSITIES = [
     img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80",
   },
   {
-    name: "Madras University",
-    loc: "Chennai, TN",
+    name: "Madurai Kamaraj University",
+    loc: "Madurai, TN",
     tags: "UGC | NAAC A++",
     blurb: "Distance programs for working aspirants.",
     img: "https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80",
   },
   {
-    name: "Annamalai University",
-    loc: "Chidambaram, TN",
+    name: "Alagappa University",
+    loc: "Karaikudi, TN",
     tags: "UGC | Distance+",
     blurb: "Flexible schedules for TNPSC preparation.",
     img: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80",
@@ -253,6 +253,9 @@ export function CompetitiveHome({
 
       {/* 3. Govt Exam Preparation banner */}
       <BlueHero>
+        <div className="pointer-events-none absolute bottom-0 right-4 top-4 hidden opacity-20 lg:block">
+          <Landmark size={140} strokeWidth={1} />
+        </div>
         <div className="relative z-10">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -280,7 +283,7 @@ export function CompetitiveHome({
         {FEATURES.map((f) => {
           const Icon = f.icon;
           return (
-            <WhiteCard key={f.title} className={`bg-gradient-to-b ${f.tone}`}>
+            <WhiteCard key={f.title} className={`bg-gradient-to-b ${f.tone} !p-3.5`}>
               <div className="mb-2 flex items-center gap-2">
                 <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${f.iconBg}`}>
                   <Icon size={16} />
@@ -288,7 +291,7 @@ export function CompetitiveHome({
                 <h3 className={`font-display text-[14px] font-extrabold ${f.accent}`}>{f.title}</h3>
               </div>
               {f.body}
-              <PillButton href={f.href} tone={f.btn} className="mt-3 w-full">
+              <PillButton href={f.href} tone={f.btn} className="mt-3 w-full !py-2">
                 {f.cta}
               </PillButton>
             </WhiteCard>
@@ -305,7 +308,7 @@ export function CompetitiveHome({
           </Link>
         }
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <ScoreRing value={68} label="Overall Progress" size={110} tone="mixed" />
           <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
             {[
@@ -328,7 +331,10 @@ export function CompetitiveHome({
           </div>
         </div>
         <div className="mt-4">
-          <p className="mb-2 text-[12px] font-bold text-slate-600">Syllabus completion</p>
+          <div className="mb-2 flex justify-between text-[12px] font-bold text-slate-600">
+            <span>Syllabus completion</span>
+            <span className="text-[#0F3DDE]">68%</span>
+          </div>
           <ProgressBar value={68} color="bg-emerald-500" />
         </div>
       </WhiteCard>
@@ -341,16 +347,21 @@ export function CompetitiveHome({
           badge="Sponsored"
           actionLabel="View All →"
         />
-        <p className="mb-3 text-[12px] text-slate-500">Colleges & Universities that support Government Exam Aspirants.</p>
-        <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <p className="mb-3 text-[12px] text-slate-500">
+          Colleges & Universities that support Government Exam Aspirants.
+        </p>
+        <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-4 lg:overflow-visible">
           {UNIVERSITIES.map((u) => (
             <article
               key={u.name}
-              className="min-w-[230px] overflow-hidden rounded-[20px] bg-white shadow-[0_2px_14px_rgba(15,23,42,0.06)] ring-1 ring-slate-100"
+              className="min-w-[230px] overflow-hidden rounded-[20px] bg-white shadow-[0_2px_14px_rgba(15,23,42,0.06)] ring-1 ring-slate-100 lg:min-w-0"
             >
               <div className="relative h-28">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={u.img} alt="" className="h-full w-full object-cover" />
+                <span className="absolute left-2 top-2 rounded-full bg-[#0F3DDE] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white">
+                  Sponsored
+                </span>
                 <button
                   type="button"
                   className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose-500"
@@ -374,7 +385,9 @@ export function CompetitiveHome({
             </article>
           ))}
         </div>
-        <CarouselDots active={0} count={4} />
+        <div className="lg:hidden">
+          <CarouselDots active={0} count={UNIVERSITIES.length} />
+        </div>
       </section>
     </DashboardPage>
   );

@@ -87,7 +87,7 @@ export default function StudentLearnPage() {
           <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex shrink-0 flex-col items-center gap-1 self-center rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm lg:self-start">
               <p className="text-[10px] font-bold uppercase tracking-wide text-blue-100">AI Roadmap Progress</p>
-              <ScoreRing value={38} label="Overall Progress" size={112} tone="mixed" onDark />
+              <ScoreRing value={38} label="Overall Progress" size={112} tone="mixed" onDark percent />
             </div>
 
             <div className="min-w-0 flex-1">

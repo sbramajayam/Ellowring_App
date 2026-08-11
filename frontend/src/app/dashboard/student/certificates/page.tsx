@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   Download,
   FolderOpen,
+  Lightbulb,
   Link2,
   Loader2,
   Plus,
@@ -99,6 +100,11 @@ const CATEGORY_BARS = [
   { label: "Domain", value: 41 },
 ];
 
+const ANALYTICS_SLICES = [
+  { label: "Verified", value: 16, color: "#0F3DDE" },
+  { label: "Pending", value: 2, color: "#F59E0B" },
+];
+
 const QUICK_ACTIONS = [
   { label: "Scan Verify", icon: ScanLine },
   { label: "Share Wallet", icon: Share2 },
@@ -137,11 +143,11 @@ export default function CertificatesPage() {
     void load();
   }, [load]);
 
-  // Collage hero stats (screenshot numbers)
   const total = 18;
   const verified = 16;
   const skills = 12;
   const badges = 8;
+  const verifiedPct = Math.round((verified / total) * 100);
 
   return (
     <StudentShell>
@@ -154,11 +160,11 @@ export default function CertificatesPage() {
         />
 
         <BlueHero>
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-[12px] font-semibold text-blue-100">Your wallet</p>
               <h2 className="mt-1 font-display text-2xl font-extrabold">Credentials at a glance</h2>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:max-w-2xl">
                 {[
                   { label: "Total", value: String(total) },
                   { label: "Verified", value: String(verified) },
@@ -170,13 +176,13 @@ export default function CertificatesPage() {
                     className="rounded-2xl bg-white/10 px-3 py-2.5 text-center ring-1 ring-white/15"
                   >
                     <p className="text-[10px] font-semibold text-blue-100">{s.label}</p>
-                    <p className="mt-0.5 font-display text-xl font-extrabold">{s.value}</p>
+                    <p className="mt-0.5 font-display text-xl font-extrabold lg:text-2xl">{s.value}</p>
                   </div>
                 ))}
               </div>
             </div>
             <PillButton tone="white" onClick={() => window.alert("Upload certificate (demo).")}>
-              <Upload size={14} /> Upload
+              <Upload size={14} /> Upload Certificate
             </PillButton>
           </div>
         </BlueHero>
@@ -200,88 +206,141 @@ export default function CertificatesPage() {
           </div>
         </WhiteCard>
 
-        <WhiteCard
-          title="My Certificates"
-          action={loading ? <Loader2 className="animate-spin text-[#0F3DDE]" size={16} /> : null}
-        >
-          <ul className="space-y-3">
-            {certs.map((c) => (
-              <li
-                key={c.id}
-                className="flex flex-wrap items-center gap-3 rounded-2xl bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100"
-              >
-                <SoftIcon icon={Award} className="bg-[#EFF6FF] text-[#0F3DDE]" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-[14px] font-extrabold text-[#0B1F3A]">
-                      {labelOf(c.title, "Certificate")}
-                    </p>
-                    {c.verified !== false ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                        <BadgeCheck size={12} /> Verified
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                        Pending
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[12px] text-slate-500">
-                    {labelOf(c.issuer, "Issuer")}
-                    {c.credentialId ? ` · ${c.credentialId}` : ""}
-                    {c.issuedAt
-                      ? ` · ${new Date(c.issuedAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}`
-                      : ""}
-                  </p>
-                </div>
-                <PillButton
-                  tone="outline"
-                  className="!py-1.5"
-                  onClick={() => window.alert("Share certificate link copied.")}
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <WhiteCard
+            title="My Certificates"
+            action={loading ? <Loader2 className="animate-spin text-[#0F3DDE]" size={16} /> : (
+              <span className="text-[11px] font-bold text-slate-400">{certs.length} shown</span>
+            )}
+          >
+            <ul className="space-y-3">
+              {certs.map((c) => (
+                <li
+                  key={c.id}
+                  className="flex flex-wrap items-center gap-3 rounded-2xl bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100"
                 >
-                  <Link2 size={14} /> Share
-                </PillButton>
-              </li>
-            ))}
-          </ul>
-        </WhiteCard>
+                  <SoftIcon icon={Award} className="bg-[#EFF6FF] text-[#0F3DDE]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[14px] font-extrabold text-[#0B1F3A]">
+                        {labelOf(c.title, "Certificate")}
+                      </p>
+                      {c.verified !== false ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                          <BadgeCheck size={12} /> Verified
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[12px] text-slate-500">
+                      {labelOf(c.issuer, "Issuer")}
+                      {c.credentialId ? ` · ${c.credentialId}` : ""}
+                      {c.issuedAt
+                        ? ` · ${new Date(c.issuedAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}`
+                        : ""}
+                    </p>
+                    {c.skills?.length ? (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {c.skills.map((sk) => (
+                          <span
+                            key={sk}
+                            className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200"
+                          >
+                            {sk}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  <PillButton
+                    tone="outline"
+                    className="!py-1.5"
+                    onClick={() => window.alert("Share certificate link copied.")}
+                  >
+                    <Link2 size={14} /> Share
+                  </PillButton>
+                </li>
+              ))}
+            </ul>
+          </WhiteCard>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <WhiteCard title="Analytics">
-            <div className="flex flex-wrap items-start gap-6">
-              <div
-                className="relative h-28 w-28 shrink-0 rounded-full"
-                style={{
-                  background: `conic-gradient(#0F3DDE ${(verified / total) * 360}deg, #E2E8F0 0)`,
-                }}
-              >
-                <div className="absolute inset-3 flex flex-col items-center justify-center rounded-full bg-white">
-                  <span className="font-display text-lg font-extrabold text-[#0B1F3A]">
-                    {Math.round((verified / total) * 100)}%
-                  </span>
-                  <span className="text-[9px] font-semibold text-slate-400">Verified</span>
-                </div>
-              </div>
-              <div className="min-w-0 flex-1 space-y-2.5">
-                <p className="text-[12px] font-bold text-slate-500">By category</p>
+          <div className="space-y-4">
+            <WhiteCard title="Certificates by Category">
+              <div className="space-y-3">
                 {CATEGORY_BARS.map((bar) => (
                   <div key={bar.label}>
                     <div className="mb-1 flex justify-between text-[11px]">
                       <span className="font-bold text-[#0B1F3A]">{bar.label}</span>
                       <span className="font-semibold text-slate-500">{bar.value}%</span>
                     </div>
-                    <ProgressBar value={bar.value} />
+                    <ProgressBar
+                      value={bar.value}
+                      color={bar.value >= 60 ? "bg-[#0F3DDE]" : "bg-sky-400"}
+                    />
                   </div>
                 ))}
               </div>
+            </WhiteCard>
+
+            <WhiteCard title="Analytics">
+              <div className="flex flex-col items-center gap-4 sm:flex-row">
+                <div
+                  className="relative h-[120px] w-[120px] shrink-0 rounded-full"
+                  style={{
+                    background: `conic-gradient(#0F3DDE ${(verified / total) * 360}deg, #F59E0B 0)`,
+                  }}
+                >
+                  <div className="absolute inset-3 flex flex-col items-center justify-center rounded-full bg-white">
+                    <span className="font-display text-lg font-extrabold text-[#0B1F3A]">
+                      {verifiedPct}%
+                    </span>
+                    <span className="text-[9px] font-semibold text-slate-400">Verified</span>
+                  </div>
+                </div>
+                <ul className="w-full space-y-2">
+                  {ANALYTICS_SLICES.map((s) => (
+                    <li key={s.label} className="flex items-center justify-between text-[12px]">
+                      <span className="inline-flex items-center gap-2 font-bold text-[#0B1F3A]">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
+                        {s.label}
+                      </span>
+                      <span className="font-semibold text-slate-500">{s.value}</span>
+                    </li>
+                  ))}
+                  <li className="rounded-xl bg-[#EFF6FF] px-3 py-2 text-[11px] font-semibold text-[#0F3DDE]">
+                    {verified} of {total} credentials blockchain-ready
+                  </li>
+                </ul>
+              </div>
+            </WhiteCard>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <WhiteCard title="AI Insight">
+            <div className="flex gap-3">
+              <SoftIcon icon={Lightbulb} className="bg-[#EFF6FF] text-[#0F3DDE]" />
+              <div>
+                <p className="text-[13px] font-extrabold text-[#0B1F3A]">Boost placement match</p>
+                <p className="mt-1 text-[12px] leading-relaxed text-slate-600">
+                  Add 1 cloud + 1 domain certificate this month to lift your AI job match from 91% to
+                  96% for Full Stack roles.
+                </p>
+              </div>
             </div>
+            <PillButton href="/dashboard/student/courses" tone="outline" className="mt-3 w-full !py-2">
+              Explore cert tracks
+            </PillButton>
           </WhiteCard>
 
-          <WhiteCard title="Badges">
+          <WhiteCard title="Achievement Badges">
             <div className="flex flex-wrap gap-2">
               {BADGES.map((b) => (
                 <span
@@ -292,8 +351,18 @@ export default function CertificatesPage() {
                 </span>
               ))}
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <PillButton tone="outline" className="!py-1.5" onClick={() => window.alert("Shared wallet summary.")}>
+          </WhiteCard>
+
+          <WhiteCard title="Share Achievement">
+            <p className="text-[12px] text-slate-600">
+              Post your Verified Pro wallet summary to LinkedIn or send a proof link to recruiters.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <PillButton
+                tone="outline"
+                className="!py-1.5"
+                onClick={() => window.alert("Shared wallet summary.")}
+              >
                 <Share2 size={13} /> Share
               </PillButton>
               <PillButton className="!py-1.5" onClick={() => window.alert("Downloading pack…")}>
@@ -303,20 +372,29 @@ export default function CertificatesPage() {
           </WhiteCard>
         </div>
 
-        <section className="flex flex-wrap items-center gap-4 rounded-[22px] bg-gradient-to-r from-[#0B1F3A] to-[#122F6B] p-5 text-white shadow-lg">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+        <section className="flex flex-col gap-4 rounded-[22px] bg-gradient-to-r from-[#0B1F3A] to-[#122F6B] p-5 text-white shadow-lg sm:flex-row sm:items-center">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
             <Shield size={22} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-display text-[16px] font-extrabold">Blockchain security</p>
+            <p className="font-display text-[16px] font-extrabold">Blockchain Verify</p>
             <p className="mt-0.5 text-[12px] text-blue-100">
               Verified Ellowring certificates are hashed and timestamped for tamper-proof proof of
               achievement.
             </p>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/20 px-3 py-1.5 text-[11px] font-bold text-emerald-300">
-            <Sparkles size={12} /> Secured
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/20 px-3 py-1.5 text-[11px] font-bold text-emerald-300">
+              <Sparkles size={12} /> Secured
+            </span>
+            <PillButton
+              tone="white"
+              className="!py-2"
+              onClick={() => window.alert("Opening blockchain verifier (demo).")}
+            >
+              <ScanLine size={14} /> Verify
+            </PillButton>
+          </div>
         </section>
       </CollagePage>
     </StudentShell>

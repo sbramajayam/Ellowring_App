@@ -120,32 +120,40 @@ const MOCK_FEED: FeedItem[] = [
 
 const TODAY = [
   {
-    title: "AI Interview Coach",
-    body: "15-min warm-up",
-    href: "/dashboard/student/ai-assistant",
-    icon: Sparkles,
-    tone: "bg-pink-50 text-pink-600",
-  },
-  {
-    title: "Campus drive",
-    body: "Accenture Associate",
-    href: "/dashboard/student/jobs",
+    title: "Internships",
+    body: "5 new matches today",
+    href: "/dashboard/student/internships",
     icon: Briefcase,
-    tone: "bg-blue-50 text-[#0F3DDE]",
+    tone: "bg-emerald-50 text-emerald-600",
+    btn: "Explore",
+    accent: "border-emerald-500 text-emerald-600",
   },
   {
-    title: "Scholarship FAQ",
-    body: "Live at 6 PM",
+    title: "Job Openings",
+    body: "4 campus drives live",
+    href: "/dashboard/student/jobs",
+    icon: Newspaper,
+    tone: "bg-blue-50 text-[#0F3DDE]",
+    btn: "Explore",
+    accent: "border-[#0F3DDE] text-[#0F3DDE]",
+  },
+  {
+    title: "Scholarships",
+    body: "3 applications closing",
     href: "/dashboard/student/wallet",
     icon: Trophy,
     tone: "bg-amber-50 text-amber-600",
+    btn: "Explore",
+    accent: "border-amber-500 text-amber-600",
   },
   {
-    title: "College fair",
-    body: "South zone listing",
+    title: "College Updates",
+    body: "Admissions & fairs",
     href: "/dashboard/student/colleges",
     icon: GraduationCap,
-    tone: "bg-emerald-50 text-emerald-600",
+    tone: "bg-violet-50 text-violet-600",
+    btn: "Explore",
+    accent: "border-violet-500 text-violet-600",
   },
 ];
 
@@ -523,20 +531,35 @@ function NotificationsInner() {
           ) : null}
         </ul>
 
-        <WhiteCard title="Today's Opportunities">
+        <WhiteCard
+          title="Today's Opportunities"
+          action={
+            <Link href="/dashboard/student/opportunities" className="text-[12px] font-semibold text-[#0F3DDE]">
+              View All &gt;
+            </Link>
+          }
+        >
           <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
             {TODAY.map((t) => {
               const Icon = t.icon;
               return (
-                <Link
+                <div
                   key={t.title}
-                  href={t.href}
-                  className="rounded-[16px] bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="flex flex-col rounded-[16px] bg-[#F8FAFC] p-3.5 ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <SoftIcon icon={Icon} className={t.tone} />
                   <p className="mt-2 text-[13px] font-extrabold text-[#0B1F3A]">{t.title}</p>
-                  <p className="text-[11px] text-slate-500">{t.body}</p>
-                </Link>
+                  <p className="mb-3 flex-1 text-[11px] text-slate-500">{t.body}</p>
+                  <Link
+                    href={t.href}
+                    className={clsx(
+                      "inline-flex items-center justify-center rounded-xl border bg-white px-3 py-1.5 text-[11px] font-bold",
+                      t.accent,
+                    )}
+                  >
+                    {t.btn}
+                  </Link>
+                </div>
               );
             })}
           </div>
@@ -564,7 +587,7 @@ function NotificationsInner() {
                 window.alert("Notifications enabled for this browser (demo).");
               }}
             >
-              Turn on alerts
+              Enable Now →
             </PillButton>
           </div>
         </BlueHero>

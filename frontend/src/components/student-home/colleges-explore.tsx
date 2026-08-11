@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Loader2,
   MapPin,
+  Scale,
   Search,
   SlidersHorizontal,
   Star,
@@ -20,6 +21,7 @@ import {
 import clsx from "clsx";
 import { BrandLogo } from "@/components/student-home/brand-logo";
 import {
+  BlueHero,
   CollageTitle,
   PillButton,
   SoftIcon,
@@ -94,7 +96,7 @@ const FILTER_PILLS = [
   { id: "fees", label: "Fees", icon: Wallet },
   { id: "placement", label: "Placement", icon: Building2 },
   { id: "scholarship", label: "Scholarship", icon: Award },
-  { id: "ownership", label: "Ownership", icon: SlidersHorizontal },
+  { id: "ownership", label: "Ownership", icon: Scale },
 ];
 
 const SCHOLARSHIPS = [
@@ -102,37 +104,42 @@ const SCHOLARSHIPS = [
     title: "Central / State Govt",
     body: "NSP & TN BC/MBC schemes",
     amount: "Up to ₹50K",
-    tone: "bg-blue-50 text-[#0F3DDE] ring-blue-100",
+    tone: "bg-gradient-to-br from-blue-50 to-white text-[#0F3DDE] ring-blue-100",
+    icon: "bg-blue-100 text-[#0F3DDE]",
     bar: "bg-[#0F3DDE]",
   },
   {
     title: "Merit Scholars",
     body: "90%+ board / entrance",
     amount: "₹25–75K",
-    tone: "bg-amber-50 text-amber-700 ring-amber-100",
+    tone: "bg-gradient-to-br from-amber-50 to-white text-amber-700 ring-amber-100",
+    icon: "bg-amber-100 text-amber-600",
     bar: "bg-amber-500",
   },
   {
     title: "Minority Support",
     body: "Community & institute aid",
     amount: "₹15–40K",
-    tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    tone: "bg-gradient-to-br from-emerald-50 to-white text-emerald-700 ring-emerald-100",
+    icon: "bg-emerald-100 text-emerald-600",
     bar: "bg-emerald-500",
   },
   {
     title: "Private Foundation",
     body: "CSR & trust fellowships",
     amount: "₹30–1L",
-    tone: "bg-violet-50 text-violet-700 ring-violet-100",
+    tone: "bg-gradient-to-br from-violet-50 to-white text-violet-700 ring-violet-100",
+    icon: "bg-violet-100 text-violet-600",
     bar: "bg-violet-500",
   },
 ];
 
-const CAMPUS_GRADIENTS = [
-  "from-[#0B1F3A] via-[#0F3DDE] to-[#60A5FA]",
-  "from-[#0F3DDE] via-[#2563EB] to-[#93C5FD]",
-  "from-[#082f49] via-[#0284c7] to-[#7dd3fc]",
-  "from-[#1e3a5f] via-[#1d4ed8] to-[#818cf8]",
+const CAMPUS_IMAGES = [
+  "https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80",
+  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80",
+  "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80",
+  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
+  "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80",
 ];
 
 const COMPARE_ROWS = [
@@ -281,7 +288,7 @@ export function CollegesExploreContent({
         </button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible">
         {FILTER_PILLS.map((f) => {
           const Icon = f.icon;
           const active = activeFilter === f.id;
@@ -316,30 +323,32 @@ export function CollegesExploreContent({
 
       <WhiteCard
         title="Sponsored Colleges"
-        action={<span className="text-[11px] font-bold text-amber-600">Promoted</span>}
+        action={<span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-700">Promoted</span>}
       >
-        <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-3 xl:grid-cols-4 lg:overflow-visible">
           {sponsored.map((c, i) => {
             const rank = nirfRank(c);
             return (
               <article
                 key={c.id}
                 className={clsx(
-                  "min-w-[260px] max-w-[280px] overflow-hidden rounded-2xl bg-white ring-1 ring-slate-100 shadow-[0_2px_12px_rgba(15,23,42,0.05)] transition",
+                  "min-w-[260px] max-w-[300px] overflow-hidden rounded-2xl bg-white ring-1 ring-slate-100 shadow-[0_2px_12px_rgba(15,23,42,0.05)] transition lg:min-w-0 lg:max-w-none",
                   carouselIdx === i && "ring-[#93C5FD]",
                 )}
               >
-                <div
-                  className={clsx(
-                    "relative h-[92px] bg-gradient-to-br",
-                    CAMPUS_GRADIENTS[i % CAMPUS_GRADIENTS.length],
-                  )}
-                >
-                  <span className="absolute left-2.5 top-2.5 rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-extrabold text-[#0B1F3A]">
+                <div className="relative h-[110px] overflow-hidden lg:h-[120px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={CAMPUS_IMAGES[i % CAMPUS_IMAGES.length]}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B1F3A]/55 to-transparent" />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-[#0B1F3A]">
                     Sponsored
                   </span>
                   <div className="absolute -bottom-5 left-3">
-                    <BrandLogo name={c.name} className="h-11 w-11 shadow-md" rounded="xl" />
+                    <BrandLogo name={c.name} className="h-11 w-11 shadow-md ring-2 ring-white" rounded="xl" />
                   </div>
                 </div>
                 <div className="px-3.5 pb-3.5 pt-7">
@@ -370,7 +379,9 @@ export function CollegesExploreContent({
                       Know More
                     </a>
                   ) : (
-                    <PillButton className="mt-3 w-full !py-2 !text-[11px]">Know More</PillButton>
+                    <PillButton href="/dashboard/student/admissions" className="mt-3 w-full !py-2 !text-[11px]">
+                      Know More
+                    </PillButton>
                   )}
                 </div>
               </article>
@@ -378,7 +389,7 @@ export function CollegesExploreContent({
           })}
         </div>
         {sponsored.length > 1 ? (
-          <div className="mt-3 flex justify-center gap-1.5">
+          <div className="mt-3 flex justify-center gap-1.5 lg:hidden">
             {sponsored.map((c, i) => (
               <button
                 key={c.id}
@@ -400,9 +411,13 @@ export function CollegesExploreContent({
 
       <WhiteCard
         title="Colleges Near You"
-        action={<span className="text-[11px] font-bold text-slate-400">TN focus</span>}
+        action={
+          <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-700">
+            Free Promotion
+          </span>
+        }
       >
-        <ul className="space-y-2.5">
+        <ul className="grid gap-2.5 lg:grid-cols-2">
           {nearYou.map((c, i) => (
             <li
               key={c.id}
@@ -456,21 +471,25 @@ export function CollegesExploreContent({
         </ul>
       </WhiteCard>
 
-      <WhiteCard title="Scholarships">
-        <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <WhiteCard
+        title="Scholarships You Can Apply For"
+        action={
+          <Link href="/dashboard/student/ai-hub#scholarship" className="text-[12px] font-semibold text-[#0F3DDE]">
+            View All →
+          </Link>
+        }
+      >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {SCHOLARSHIPS.map((s) => (
             <article
               key={s.title}
-              className={clsx(
-                "min-w-[200px] max-w-[220px] overflow-hidden rounded-2xl p-3.5 ring-1",
-                s.tone,
-              )}
+              className={clsx("overflow-hidden rounded-2xl p-3.5 ring-1", s.tone)}
             >
               <div className={clsx("mb-2 h-1 w-10 rounded-full", s.bar)} />
-              <SoftIcon icon={Award} className="h-9 w-9 bg-white/80" />
+              <SoftIcon icon={Award} className={clsx("h-9 w-9", s.icon)} />
               <h3 className="mt-2 text-[13px] font-extrabold text-[#0B1F3A]">{s.title}</h3>
               <p className="mt-0.5 text-[11px] opacity-80">{s.body}</p>
-              <p className="mt-2 text-[12px] font-extrabold">{s.amount}</p>
+              <p className="mt-2 font-display text-[14px] font-extrabold">{s.amount}</p>
               <PillButton
                 href="/dashboard/student/ai-hub#scholarship"
                 className="mt-3 w-full !py-1.5 !text-[11px]"
@@ -482,13 +501,13 @@ export function CollegesExploreContent({
         </div>
       </WhiteCard>
 
-      <section className="overflow-hidden rounded-[22px] bg-[#EFF6FF] p-4 ring-1 ring-[#BFDBFE] lg:p-5">
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+      <BlueHero className="!from-[#0F3DDE] !via-[#2563EB] !to-[#60A5FA]">
+        <div className="relative z-10 grid gap-4 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wide text-[#0F3DDE]">
-              Compare & Choose
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-blue-100">
+              <SlidersHorizontal size={12} /> Compare Colleges
             </p>
-            <h3 className="mt-1 font-display text-lg font-extrabold text-[#0B1F3A]">
+            <h3 className="mt-1 font-display text-xl font-extrabold lg:text-2xl">
               Side-by-side fees, NIRF & placements
             </h3>
             <ul className="mt-3 space-y-1.5">
@@ -497,17 +516,17 @@ export function CollegesExploreContent({
                 "AI ranks fit for your budget & course",
                 "See scholarship probability",
               ].map((t) => (
-                <li key={t} className="flex items-center gap-2 text-[12px] font-semibold text-[#0B1F3A]">
-                  <CheckCircle2 size={15} className="text-[#0F3DDE]" />
+                <li key={t} className="flex items-center gap-2 text-[12px] font-semibold text-white">
+                  <CheckCircle2 size={15} className="text-emerald-300" />
                   {t}
                 </li>
               ))}
             </ul>
-            <PillButton href="/dashboard/student/ai-assistant" className="mt-4">
+            <PillButton href="/dashboard/student/ai-assistant" tone="white" className="mt-4">
               Start Comparing
             </PillButton>
           </div>
-          <div className="overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100">
+          <div className="overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-white/40">
             <div className="mb-2 grid grid-cols-4 gap-1 text-[9px] font-bold text-slate-400">
               <span />
               <span className="text-center text-[#0F3DDE]">PSG</span>
@@ -533,7 +552,7 @@ export function CollegesExploreContent({
             </Link>
           </div>
         </div>
-      </section>
+      </BlueHero>
     </div>
   );
 }

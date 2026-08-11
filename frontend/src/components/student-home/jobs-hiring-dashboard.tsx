@@ -10,6 +10,7 @@ import {
   Circle,
   Lightbulb,
   MapPin,
+  Mic,
   Sparkles,
 } from "lucide-react";
 import {
@@ -109,15 +110,18 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
       <BlueHero>
         <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-100">AI Job Match</p>
-            <h2 className="mt-1 font-display text-xl font-extrabold lg:text-2xl">Excellent Match</h2>
-            <p className="mt-1.5 text-[13px] text-blue-100">
-              Recommended Role: <span className="font-bold text-white">Junior Full Stack Developer</span>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-100">
+              AI Job Match Score
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <h2 className="mt-1 font-display text-xl font-extrabold lg:text-2xl">Excellent Match · 91%</h2>
+            <p className="mt-1.5 text-[13px] text-blue-100">
+              Recommended Role:{" "}
+              <span className="font-bold text-white">Junior Full Stack Developer</span>
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:max-w-xl">
               {[
                 { label: "Experience", value: "Fresher" },
-                { label: "Locations", value: "Bangalore / Chennai" },
+                { label: "Location", value: "Bangalore / Chennai" },
                 { label: "Salary", value: "₹4.5–6.5 LPA" },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl bg-white/10 px-3 py-2.5">
@@ -130,28 +134,32 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
               <PillButton href="/dashboard/student/resume" tone="white">
                 Apply with AI Resume
               </PillButton>
-              <PillButton href="/dashboard/student/jobs" tone="outline" className="!bg-white/10 !text-white !ring-white/40">
+              <PillButton
+                href="/dashboard/student/jobs"
+                tone="outline"
+                className="!bg-white/10 !text-white !ring-white/40"
+              >
                 Browse Matches
               </PillButton>
             </div>
           </div>
-          <div className="flex shrink-0 flex-col items-center gap-1 self-center rounded-2xl bg-white/10 px-5 py-4">
-            <ScoreRing value={91} label="Match Score" size={104} tone="mixed" onDark />
+          <div className="flex shrink-0 flex-col items-center gap-1 self-center rounded-2xl bg-white/10 px-6 py-5">
+            <ScoreRing value={91} label="Match Score" size={112} tone="mixed" onDark percent />
             <p className="text-[11px] font-semibold text-emerald-200">Excellent Match</p>
           </div>
         </div>
       </BlueHero>
 
       <WhiteCard title="Hiring Pipeline">
-        <div className="flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:gap-2 lg:overflow-visible">
           {PIPELINE.map((step, i) => (
-            <div key={step.label} className="flex min-w-0 flex-1 items-center gap-1.5">
+            <div key={step.label} className="flex min-w-0 flex-1 items-center gap-1 lg:gap-2">
               <div
-                className={`flex min-w-[100px] flex-col items-center rounded-2xl px-2 py-3 text-center ${
+                className={`flex w-full min-w-[96px] flex-col items-center rounded-2xl px-2 py-3 text-center lg:min-w-0 ${
                   step.status === "done"
                     ? "bg-emerald-50 ring-1 ring-emerald-100"
                     : step.status === "active"
-                      ? "bg-[#EFF6FF] ring-1 ring-[#BFDBFE]"
+                      ? "bg-[#EFF6FF] ring-1 ring-[#BFDBFE] shadow-[0_4px_12px_rgba(15,61,222,0.12)]"
                       : "bg-slate-50"
                 }`}
               >
@@ -165,7 +173,7 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
                   <Circle size={18} className="text-slate-300" />
                 )}
                 <p
-                  className={`mt-1.5 text-[10px] font-bold leading-tight ${
+                  className={`mt-1.5 text-[10px] font-bold leading-tight lg:text-[11px] ${
                     step.status !== "upcoming" ? "text-[#0B1F3A]" : "text-slate-400"
                   }`}
                 >
@@ -174,7 +182,7 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
               </div>
               {i < PIPELINE.length - 1 ? (
                 <span
-                  className={`hidden h-0.5 w-2.5 shrink-0 sm:block ${
+                  className={`hidden h-0.5 w-3 shrink-0 lg:block ${
                     step.status === "done" ? "bg-emerald-300" : "bg-slate-200"
                   }`}
                 />
@@ -183,11 +191,12 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
           ))}
         </div>
         <p className="mt-3 text-[12px] text-slate-500">
-          Current stage: <span className="font-bold text-[#0F3DDE]">Shortlisted</span> · prepare interview via AI Coach.
+          Current stage: <span className="font-bold text-[#0F3DDE]">Shortlisted</span> · prepare
+          interview via AI Coach.
         </p>
       </WhiteCard>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <WhiteCard
           title="Featured Ellowring Opportunities"
           action={
@@ -205,7 +214,7 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-[13px] font-extrabold text-[#0B1F3A]">{job.role}</h3>
                       <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                        {job.match}%
+                        {job.match}% match
                       </span>
                     </div>
                     <p className="mt-0.5 text-[11px] text-slate-500">
@@ -234,7 +243,7 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
         <WhiteCard
           title="Campus Recruitment"
           action={
-            <Link href="/dashboard/student/jobs" className="text-[12px] font-bold text-[#0F3DDE]">
+            <Link href="/dashboard/student/calendar" className="text-[12px] font-bold text-[#0F3DDE]">
               Calendar
             </Link>
           }
@@ -264,7 +273,7 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <WhiteCard title="AI Skill Match">
+        <WhiteCard title="AI Skill Match Analysis">
           <div className="space-y-3.5">
             {SKILL_MATCH.map((s) => (
               <div key={s.name}>
@@ -281,16 +290,22 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
             <div>
               <p className="text-[12px] font-extrabold text-[#0B1F3A]">AI Tip</p>
               <p className="mt-0.5 text-[11px] leading-relaxed text-slate-600">
-                Lift DSA Essentials to 70%+ this week — unlocks 24 extra Full Stack openings in your match pool.
+                Lift DSA Essentials to 70%+ this week — unlocks 24 extra Full Stack openings in your
+                match pool.
               </p>
             </div>
           </div>
         </WhiteCard>
 
-        <WhiteCard title="Placement Readiness" className="text-[#0B1F3A]">
-          <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-4">
-            <ScoreRing value={86} label="Ready" size={96} tone="blue" />
-            <ul className="mt-4 w-full space-y-2 sm:mt-0">
+        <WhiteCard title="Interview & Placement Readiness" className="text-[#0B1F3A]">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+            <div className="flex flex-col items-center">
+              <ScoreRing value={86} label="Ready" size={104} tone="blue" percent />
+              <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-[#0F3DDE]">
+                <Mic size={12} /> Interview ready
+              </p>
+            </div>
+            <ul className="w-full space-y-2">
               {READINESS.map((item) => (
                 <li key={item.label} className="flex items-start gap-2 text-[12px]">
                   {item.done ? (
@@ -305,6 +320,9 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
               ))}
             </ul>
           </div>
+          <PillButton href="/dashboard/student/ai-assistant" tone="outline" className="mt-4 w-full !py-2">
+            Open AI Interview Coach
+          </PillButton>
         </WhiteCard>
       </div>
 
@@ -337,7 +355,10 @@ export function JobsHiringCollage({ footer }: { footer?: ReactNode }) {
         >
           <ul className="space-y-2.5">
             {ALERTS.map((a) => (
-              <li key={a.title} className="flex items-start gap-3 rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-100">
+              <li
+                key={a.title}
+                className="flex items-start gap-3 rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-100"
+              >
                 <SoftIcon
                   icon={Bell}
                   className={
