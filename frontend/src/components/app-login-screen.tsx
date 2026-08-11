@@ -179,7 +179,7 @@ export function AppLoginScreen() {
 
         <button
           type="submit"
-          disabled={loading || apiStatus?.ok === false}
+          disabled={loading}
           className={authCardPrimaryBtn}
         >
           {loading ? "Signing in…" : "Sign In"}
