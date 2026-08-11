@@ -54,13 +54,14 @@ export async function checkApiHealth(): Promise<{
     return { ok: true, base, detail: "API reachable" };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Network error";
+    const hint =
+      msg === "Failed to fetch"
+        ? `Cannot reach API (${base}). Hard-refresh (Ctrl+Shift+R). If it persists, the backend tunnel is down.`
+        : msg;
     return {
       ok: false,
       base,
-      detail:
-        msg === "Failed to fetch"
-          ? `Cannot reach API (${base}). Backend or tunnel is down / blocked by the browser.`
-          : msg,
+      detail: hint,
     };
   }
 }

@@ -37,7 +37,7 @@ export default function RootLayout({
             __html: `window.__ELLOWRING_API_URL__=${JSON.stringify(apiUrl)};`,
           }}
         />
-        <script src={`${base}/runtime-config.js?v=20260810-tunnel2`} />
+        <script src={`${base}/runtime-config.js?v=20260811-tunnel3`} />
       </head>
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         <I18nProvider>
